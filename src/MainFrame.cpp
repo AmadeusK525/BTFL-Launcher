@@ -7,5 +7,6 @@ MainFrame::MainFrame(wxWindow* parent,
 	const wxSize& size,
 	long style, 
 	const wxString& name) : wxFrame(parent, id, title, pos, size, style, name) {
+	SetIcon(wxICON(aaaaBTFLValusLogoNoText));
 	m_overview = new OverviewPanel(this);
 }
