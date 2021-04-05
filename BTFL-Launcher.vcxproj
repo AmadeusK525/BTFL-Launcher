@@ -21,10 +21,15 @@
   <ItemGroup>
     <ClInclude Include="src\MainFrame.h" />
     <ClInclude Include="src\MyApp.h" />
+    <ClInclude Include="src\OverviewPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\MainFrame.cpp" />
     <ClCompile Include="src\MyApp.cpp" />
+    <ClCompile Include="src\OverviewPanel.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

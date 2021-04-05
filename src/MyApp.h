@@ -3,6 +3,7 @@
 #pragma once
 
 #include <wx\wx.h>
+#include <wx\image.h>
 #include "MainFrame.h"
 
 class MyApp : public wxApp {

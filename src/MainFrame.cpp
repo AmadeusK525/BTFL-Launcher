@@ -7,5 +7,5 @@ MainFrame::MainFrame(wxWindow* parent,
 	const wxSize& size,
 	long style, 
 	const wxString& name) : wxFrame(parent, id, title, pos, size, style, name) {
-
+	m_overview = new OverviewPanel(this);
 }

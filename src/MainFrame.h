@@ -3,10 +3,11 @@
 #pragma once
 
 #include <wx\wx.h>
+#include "OverviewPanel.h"
 
 class MainFrame : public wxFrame {
 private:
-
+	OverviewPanel* m_overview = nullptr;
 
 public:
 	MainFrame(wxWindow* parent,
