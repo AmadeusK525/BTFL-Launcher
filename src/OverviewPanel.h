@@ -7,8 +7,9 @@
 class OverviewPanel : public wxPanel{
 private:
 	wxBitmap m_background{};
-	int m_bgy = 0;
-	double m_scale = 1.0;
+	int m_bgx = 0, m_bgy = 0;
+	double m_bgRatio = 0.0;
+	double m_bgScale = 1.0;
 
 public:
 	OverviewPanel(wxWindow* parent);
