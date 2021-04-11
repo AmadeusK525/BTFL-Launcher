@@ -17,6 +17,8 @@ public:
 		const wxSize& size = wxDefaultSize,
 		long style = wxDEFAULT_FRAME_STYLE,
 		const wxString& name = wxFrameNameStr);
+
+	inline OverviewPanel* GetOverviewPanel() { return m_overview; }
 };
 
 #endif

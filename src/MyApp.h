@@ -4,7 +4,8 @@
 
 #include <wx\wx.h>
 #include <wx\image.h>
-#include "MainFrame.h"
+
+class MainFrame;
 
 class MyApp : public wxApp {
 private:
@@ -15,5 +16,4 @@ public:
 };
 
 wxDECLARE_APP(MyApp);
-
 #endif
