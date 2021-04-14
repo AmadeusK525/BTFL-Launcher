@@ -3,11 +3,16 @@
 #pragma once
 
 #include <wx\wx.h>
-#include "OverviewPanel.h"
+
+#include "MainPanel.h"
+#include "PatchNotes.h"
 
 class MainFrame : public wxFrame {
 private:
-	OverviewPanel* m_overview = nullptr;
+	MainPanel* m_mainPanel = nullptr;
+	wxSFDiagramManager m_mainPanelManager;
+
+	LeftSidebar* m_patchNotesWindow = nullptr;
 
 public:
 	MainFrame(wxWindow* parent,
@@ -18,7 +23,8 @@ public:
 		long style = wxDEFAULT_FRAME_STYLE,
 		const wxString& name = wxFrameNameStr);
 
-	inline OverviewPanel* GetOverviewPanel() { return m_overview; }
+	void LoadPatchNotes();
+	inline const wxBitmap& GetBackgroundBitmap() { return m_mainPanel->GetBackgroundBitmap(); }
 };
 
 #endif

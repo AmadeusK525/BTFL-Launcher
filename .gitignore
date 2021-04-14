@@ -363,4 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 Assets/iso/
+Temp.xml
 IsoHashes.h

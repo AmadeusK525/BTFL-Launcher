@@ -4,51 +4,84 @@
 
 #include <wx\wx.h>
 #include <wx\scrolwin.h>
+#include <wx\richtext\richtextctrl.h>
 
-class OverviewPanel;
+#include "Scrollbar.h"
 
-class PatchNotesWindow : public wxScrolledWindow {
-	OverviewPanel* m_overviewPanel = nullptr;
+class MainFrame;
 
-	wxString m_title, m_titleToDraw;
-	wxString m_content, m_contentToDraw;
-	wxSize m_titleSize, m_contentSize;
+class PatchNotesWindow : public wxRichTextCtrl {
+	wxBitmap m_shadowBitmap;
+public:
+	PatchNotesWindow(wxWindow* parent, 
+		wxWindowID id = -1,
+		const wxString& value = wxEmptyString,
+		const wxPoint& pos = wxDefaultPosition,
+		const wxSize& size = wxDefaultSize,
+		long style = wxBORDER_NONE);
 
-	double m_bgScale = 1.0;
+	virtual void PaintAboveContent(wxDC& dc) override;
+};
+
+
+///////////////////////////////////////////////////////////////////////
+/////////////////////////// HyperlinkPanel ////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+
+class HyperlinkPanel : public wxPanel {
+	wxBitmap m_bitmap;
+	wxString m_url;
+
+	int m_padding = 1;
 	int m_bgx = 0, m_bgy = 0;
-	wxPoint m_separatorPos;
-	int m_contentY = 0;
+	double m_bgScale = 0;
+	double m_bgRatio = 0;
+
+	bool m_isHovering = false;
 
 public:
-	PatchNotesWindow(wxWindow* parent,
+	HyperlinkPanel(wxWindow* parent, const wxString& url, const wxBitmap& bmp, const wxSize& size = wxDefaultSize,
+		const wxPoint& pos = wxDefaultPosition, long style = wxBORDER_NONE);
+
+	void RecalculateSelf();
+
+	void OnSize(wxSizeEvent& event);
+	void OnPaint(wxPaintEvent& event);
+
+	void OnLeftDown(wxMouseEvent& event);
+	void OnEnterWindow(wxMouseEvent& event);
+	void OnLeaveWindow(wxMouseEvent& event);
+
+	wxDECLARE_EVENT_TABLE();
+};
+
+
+///////////////////////////////////////////////////////////////////////
+///////////////////////////// LeftSidebar /////////////////////////////
+///////////////////////////////////////////////////////////////////////
+
+
+class LeftSidebar : public wxPanel {
+	MainFrame* m_mainFrame = nullptr;
+	PatchNotesWindow* m_rtc = nullptr;
+
+	CustomRTCScrollbar* m_scrollbar = nullptr;
+
+	bool m_isDragging = false;
+
+public:
+	LeftSidebar(wxWindow* parent,
 		wxWindowID id,
 		const wxPoint& pos = wxDefaultPosition,
 		const wxSize& size = wxDefaultSize,
-		long style = wxHSCROLL | wxVSCROLL);
+		long style = wxBORDER_NONE);
 
-	inline void SetBackgroundX(int x) { m_bgx = x; }
-	inline void SetBackgroundY(int y) { m_bgy = y; }
-	inline void SetBackgroundScale(double scale) { m_bgScale = scale; }
-
-	inline void SetTitle(const wxString& title) { 
-		m_title = title;
-		DoReposition(false, true);
-	}
-
-	inline void SetContent(const wxString& content) {
-		m_content = content;
-		DoReposition(true, false);
-	}
-
-	void DoReposition(bool calcContent, bool calcTitle);
-
-	void OnPaint(wxPaintEvent& dc);
-	void OnScroll(wxScrollWinEvent& event);
+	bool Load();
+	void OnPaint(wxPaintEvent& event);
+	void OnMove(wxMouseEvent& event);
 
 	DECLARE_EVENT_TABLE()
-
-private:
-	void CalcWrappedText(wxString* str, wxString* strToDraw,const wxFont& font, wxSize* size = nullptr);
 };
 
 #endif

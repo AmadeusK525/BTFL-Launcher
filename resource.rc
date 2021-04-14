@@ -2,4 +2,8 @@
 // the application in the taskbar.
 aaaaBTFLValusLogoNoText ICON "Assets\\BTFLValusLogoNoText.ico"
 
-pabloRA-Phoenix RCDATA "Assets\\PhoenixArenaPablo.png"
+pabloRA_Phoenix RCDATA "Assets\\PhoenixArenaPablo.png"
+pabloRA_Roc RCDATA "Assets\\RocArenaPablo.png"
+frameShape RCDATA "Assets\\FrameShape.png"
+
+logo RCDATA "Assets\\LauncherLogo.png"
