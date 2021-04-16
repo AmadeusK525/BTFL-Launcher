@@ -18,7 +18,9 @@ PatchNotesWindow::PatchNotesWindow(wxWindow* parent,
 	SetTextCursor(wxCURSOR_DEFAULT);
 	Bind(wxEVT_SET_FOCUS, [](wxFocusEvent&) {});
 	Bind(wxEVT_LEFT_DOWN, [](wxMouseEvent&) {});
+	Bind(wxEVT_RIGHT_UP, [](wxMouseEvent&) {});
 	Bind(wxEVT_CHAR, [](wxKeyEvent&) {});
+	Bind(wxEVT_KEY_DOWN, [](wxKeyEvent&) {});
 
 	m_shadowBitmap.LoadFile("Assets\\Scroll Shadow\\Large@2x.png", wxBITMAP_TYPE_PNG);
 }
@@ -30,7 +32,7 @@ void PatchNotesWindow::PaintAboveContent(wxDC& dc) {
 
 	double scale = (double)size.x / m_shadowBitmap.GetWidth();
 	dc.SetUserScale(scale, scale);
-	dc.DrawBitmap(m_shadowBitmap, wxPoint(0, (double)(size.y + yo - ((double)m_shadowBitmap.GetHeight() * scale)) / scale), true);
+	dc.DrawBitmap(m_shadowBitmap, wxPoint(0, size.y + yo - (double)m_shadowBitmap.GetHeight()), true);
 	dc.SetUserScale(1.0, 1.0);
 }
 

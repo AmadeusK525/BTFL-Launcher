@@ -1,5 +1,7 @@
 #include "MainFrame.h"
 
+#include <wx\hyperlink.h>
+
 MainFrame::MainFrame(wxWindow* parent, 
 	wxWindowID id,
 	const wxString& title,

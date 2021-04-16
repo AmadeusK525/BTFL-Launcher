@@ -191,3 +191,7 @@ void CustomRTCScrollbar::OnMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 	m_scrollOnHold.Stop();
 	RecalculateSelf();
 }
+
+void CustomRTCScrollbar::OnScrollWin(wxScrollWinEvent& event) {
+	DoScroll(m_currentPos + 1);
+}

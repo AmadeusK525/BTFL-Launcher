@@ -21,6 +21,7 @@ public:
 		long style = wxBORDER_NONE);
 
 	virtual void PaintAboveContent(wxDC& dc) override;
+	virtual void Paste() override {};
 };
 
 
