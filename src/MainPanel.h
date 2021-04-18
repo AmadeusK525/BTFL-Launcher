@@ -5,7 +5,9 @@
 #include <wx\wx.h>
 #include <wx\wxsf\wxShapeFramework.h>
 
+#include "BaseClasses.h"
 #include "PatchNotes.h"
+#include "FrameButtons.h"
 
 class MainPanel;
 
@@ -60,24 +62,18 @@ public:
 /////////////////////////////////////////////////////////////////////
 
 enum {
-	BUTTON_Help,
-	BUTTON_Minimize,
-	BUTTON_Close,
-
 	BUTTON_SelectIso,
+	BUTTON_VerifyIso,
 	BUTTON_Install,
 	BUTTON_Play
 };
 
-class MainPanel : public wxSFShapeCanvas {
+class MainPanel : public BackgroundImageCanvas {
 private:
-	wxBitmap m_background;
 	wxBitmap m_logo;
-	int m_bgx = 0, m_bgy = 0,
-		m_bgxoffset = 0, m_bgyoffset = 0;
 	int m_logox = 0, m_logoy = 0;
-	double m_bgRatio, m_bgScale;
-	const int MAX_BG_OFFSET = 20;
+
+	wxString m_isoPath;
 
 	wxString m_fileLabel{ "No ISO selected..." }, m_fileDesc{"View Installation Guide"};
 	wxFont m_fileLabelFont{ wxFontInfo(12).FaceName("Times New Roman") },
@@ -95,10 +91,7 @@ private:
 
 	TransparentButton* m_mainButton = nullptr,
 		* m_configButton = nullptr;
-	wxSFGridShape* m_frameButtons = nullptr;
-
-	wxPoint m_mousePosOnEnter{ 0,0 };
-	wxTimer m_bgAnimTimer;
+	FrameButtons* m_frameButtons = nullptr;
 
 public:
 	MainPanel(wxSFDiagramManager* manager, 
@@ -113,18 +106,11 @@ public:
 
 	void OnFrameButtons(wxSFShapeMouseEvent& event);
 	void OnSelectIso(wxSFShapeMouseEvent& event);
-
-	void OnSize(wxSizeEvent& event);
+	
+	virtual void OnSize(wxSizeEvent& event) override;
 	virtual void OnMouseMove(wxMouseEvent& event) override;
 
-	virtual void OnUpdateVirtualSize(wxRect& rect) override;
-	virtual void DrawBackground(wxDC& dc, bool fromPaint) override;
 	virtual void DrawForeground(wxDC& dc, bool fromPaint) override;
-
-	void OnEnterWindow(wxMouseEvent& event);
-	void OnLeaveWindow(wxMouseEvent& event);
-
-	void OnBgAnimTimer(wxTimerEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 };

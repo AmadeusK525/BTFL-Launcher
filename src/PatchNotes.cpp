@@ -8,35 +8,6 @@
 #include <wx\fs_inet.h>
 #include <wx\sstream.h>
 
-PatchNotesWindow::PatchNotesWindow(wxWindow* parent,
-	wxWindowID id,
-	const wxString& value,
-	const wxPoint& pos,
-	const wxSize& size,
-	long style) : wxRichTextCtrl(parent, id, value, pos, size, style) {
-	SetCursor(wxCURSOR_DEFAULT);
-	SetTextCursor(wxCURSOR_DEFAULT);
-	Bind(wxEVT_SET_FOCUS, [](wxFocusEvent&) {});
-	Bind(wxEVT_LEFT_DOWN, [](wxMouseEvent&) {});
-	Bind(wxEVT_RIGHT_UP, [](wxMouseEvent&) {});
-	Bind(wxEVT_CHAR, [](wxKeyEvent&) {});
-	Bind(wxEVT_KEY_DOWN, [](wxKeyEvent&) {});
-
-	m_shadowBitmap.LoadFile("Assets\\Scroll Shadow\\Large@2x.png", wxBITMAP_TYPE_PNG);
-}
-
-void PatchNotesWindow::PaintAboveContent(wxDC& dc) {
-	int yo;
-	CalcUnscrolledPosition(0, 0, nullptr, &yo);
-	wxSize size = GetClientSize();
-
-	double scale = (double)size.x / m_shadowBitmap.GetWidth();
-	dc.SetUserScale(scale, scale);
-	dc.DrawBitmap(m_shadowBitmap, wxPoint(0, size.y + yo - (double)m_shadowBitmap.GetHeight()), true);
-	dc.SetUserScale(1.0, 1.0);
-}
-
-
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////// HyperlinkPanel ////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -145,21 +116,9 @@ LeftSidebar::LeftSidebar(wxWindow* parent,
 	wxFileSystem::AddHandler(new wxInternetFSHandler);
 	wxRichTextBuffer::AddHandler(new wxRichTextXMLHandler);
 
-	m_rtc = new PatchNotesWindow(this, -1, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	m_rtc = new ReadOnlyRTC(this, -1, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	m_rtc->ShowScrollbars(wxSHOW_SB_NEVER, wxSHOW_SB_NEVER);
 	m_rtc->SetScrollRate(15, 15);
-
-	wxRichTextAttr attr;
-	attr.SetFont(wxFontInfo(12).FaceName("Times New Roman"));
-	attr.SetAlignment(wxTEXT_ALIGNMENT_JUSTIFIED);
-	attr.SetLeftIndent(64);
-	attr.SetRightIndent(64);
-	attr.SetLineSpacing(10);
-	attr.SetTextColour(wxColour(210, 210, 210));
-
-	m_rtc->SetBasicStyle(attr);
-	m_rtc->SetBackgroundColour(wxColour(0, 0, 0));
-	m_rtc->SetFontScale(1.13);
 
 	m_rtc->SetValue("\nFetching latest content...");
 
@@ -219,6 +178,10 @@ bool LeftSidebar::Load() {
 	}
 
 	return false;
+}
+
+void LeftSidebar::SetMessage(const wxString& message) {
+	m_rtc->SetValue(message);
 }
 
 void LeftSidebar::OnPaint(wxPaintEvent& event) {

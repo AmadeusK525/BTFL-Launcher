@@ -8,7 +8,7 @@ wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit() {
 	wxInitAllImageHandlers();
-	wxBitmap shape = wxBITMAP_PNG(frameShape);
+	wxBitmap shape("Assets\\FrameShape.png", wxBITMAP_TYPE_PNG);
 
 	// ***For Visual Studio Project only***
 	wxFileName exec = argv[0];

@@ -37,6 +37,8 @@ CustomRTCScrollbar::CustomRTCScrollbar(wxWindow* parent, wxRichTextCtrl* target,
 	SetBackgroundColour(wxColour(0, 0, 0));
 	SetForegroundColour(wxColour(255, 255, 255));
 
+	m_rtc->ShowScrollbars(wxSHOW_SB_DEFAULT, wxSHOW_SB_NEVER);
+
 	m_rtc->Bind(wxEVT_SIZE, &CustomRTCScrollbar::OnTargetSize, this);
 	m_rtc->Bind(wxEVT_SCROLLWIN_BOTTOM, &CustomRTCScrollbar::OnTargetScroll, this);
 	m_rtc->Bind(wxEVT_SCROLLWIN_TOP, &CustomRTCScrollbar::OnTargetScroll, this);
@@ -52,16 +54,19 @@ CustomRTCScrollbar::CustomRTCScrollbar(wxWindow* parent, wxRichTextCtrl* target,
 
 void CustomRTCScrollbar::RecalculateSelf() {
 	wxSize size = GetSize();
+	wxSize rtcSize = m_rtc->GetClientSize();
+	wxSize rtcVirtualSize = m_rtc->GetVirtualSize();
+
 	if (m_orientation == wxVERTICAL) {
-		m_ratio = (double)size.y / m_rtc->GetVirtualSize().y;
+		m_ratio = (double)size.y / rtcVirtualSize.y;
 
 		int yo;
 		m_rtc->CalcUnscrolledPosition(0, 0, nullptr, &yo);
 		m_currentPos = yo * m_ratio;
-		m_currentThumbRect = wxRect(0, m_currentPos, size.x, (int)(m_rtc->GetClientSize().y * m_ratio));
+		m_currentThumbRect = wxRect(0, m_currentPos, size.x, (int)(rtcSize.y * m_ratio));
 	}
 
-	if (m_currentThumbRect.GetHeight() >= size.y) {
+	if (rtcVirtualSize.y < rtcSize.y || rtcVirtualSize.x < rtcSize.x) {
 		if (IsShown())
 			Hide();
 	} else {
@@ -71,6 +76,7 @@ void CustomRTCScrollbar::RecalculateSelf() {
 				m_parent->Layout();
 		}
 		Refresh();
+		Update();
 	}
 }
 
@@ -84,10 +90,12 @@ void CustomRTCScrollbar::DoScroll(int pos) {
 		m_currentPos = pos;
 
 	m_currentThumbRect.SetY(m_currentPos);
+	m_rtc->Freeze();
 	m_rtc->Scroll(0, ((double)m_currentPos / m_ratio) / m_rtc->GetLineHeight());
-	m_rtc->Refresh();
+	m_rtc->Thaw();
 
 	Refresh();
+	Update();
 }
 
 void CustomRTCScrollbar::OnTargetScroll(wxScrollWinEvent& event) {
@@ -168,6 +176,7 @@ void CustomRTCScrollbar::OnLeftUp(wxMouseEvent& event) {
 		ReleaseMouse();
 
 	m_isDragging = false;
+	m_setOffOnHold.Stop();
 	m_scrollOnHold.Stop();
 	RecalculateSelf();
 }

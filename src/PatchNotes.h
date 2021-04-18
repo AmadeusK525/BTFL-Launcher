@@ -6,24 +6,10 @@
 #include <wx\scrolwin.h>
 #include <wx\richtext\richtextctrl.h>
 
+#include "BaseClasses.h"
 #include "Scrollbar.h"
 
 class MainFrame;
-
-class PatchNotesWindow : public wxRichTextCtrl {
-	wxBitmap m_shadowBitmap;
-public:
-	PatchNotesWindow(wxWindow* parent, 
-		wxWindowID id = -1,
-		const wxString& value = wxEmptyString,
-		const wxPoint& pos = wxDefaultPosition,
-		const wxSize& size = wxDefaultSize,
-		long style = wxBORDER_NONE);
-
-	virtual void PaintAboveContent(wxDC& dc) override;
-	virtual void Paste() override {};
-};
-
 
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////// HyperlinkPanel ////////////////////////////
@@ -65,7 +51,7 @@ public:
 
 class LeftSidebar : public wxPanel {
 	MainFrame* m_mainFrame = nullptr;
-	PatchNotesWindow* m_rtc = nullptr;
+	ReadOnlyRTC* m_rtc = nullptr;
 
 	CustomRTCScrollbar* m_scrollbar = nullptr;
 
@@ -79,6 +65,8 @@ public:
 		long style = wxBORDER_NONE);
 
 	bool Load();
+	void SetMessage(const wxString& message);
+
 	void OnPaint(wxPaintEvent& event);
 	void OnMove(wxMouseEvent& event);
 

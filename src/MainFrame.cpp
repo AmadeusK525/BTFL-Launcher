@@ -13,21 +13,24 @@ MainFrame::MainFrame(wxWindow* parent,
 	m_patchNotesWindow = new LeftSidebar(this, -1, wxDefaultPosition, wxSize(400, -1), wxBORDER_NONE);
 	m_mainPanel = new MainPanel(&m_mainPanelManager, this, -1);
 
+	m_seconPanel = new SecondaryPanel(&m_seconPanelManager, this);
+	m_seconPanel->Hide();
+
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(m_patchNotesWindow, wxSizerFlags(0).Expand());
 	sizer->Add(m_mainPanel, wxSizerFlags(1).Expand());
 
-	wxPanel* copyrightPanel = new wxPanel(this, -1, wxDefaultPosition, wxSize(-1, 40), wxBORDER_NONE);
-	copyrightPanel->SetBackgroundColour(wxColour(0, 0, 0));
+	m_copyrightPanel = new wxPanel(this, -1, wxDefaultPosition, wxSize(-1, 40), wxBORDER_NONE);
+	m_copyrightPanel->SetBackgroundColour(wxColour(0, 0, 0));
 
-	wxStaticText* copyright = new wxStaticText(copyrightPanel, -1, "Beyond The Forbidden Lands is officialy classified as a modification of \"Shadow of the Colossus\" (2005) and ownership of the original game is required to play.");
+	wxStaticText* copyright = new wxStaticText(m_copyrightPanel, -1, "Beyond The Forbidden Lands is officialy classified as a modification of \"Shadow of the Colossus\" (2005) and ownership of the original game is required to play.");
 	copyright->SetFont(wxFontInfo(11).FaceName("Times New Roman"));
 	copyright->SetForegroundColour(wxColour(150, 150, 150));
 
-	wxStaticText* readDisclaimers = new wxStaticText(copyrightPanel, -1, "Read Disclaimers");
+	wxStaticText* readDisclaimers = new wxStaticText(m_copyrightPanel, -1, "Read Disclaimers");
 	readDisclaimers->SetFont(wxFontInfo(11).FaceName("Times New Roman"));
 	readDisclaimers->SetForegroundColour(wxColour(52, 199, 226));
-	readDisclaimers->Bind(wxEVT_LEFT_DOWN, [](wxMouseEvent&) { wxLaunchDefaultBrowser("http://btflgame.com"); });
+	readDisclaimers->Bind(wxEVT_LEFT_DOWN, &MainFrame::OnReadDisclaimer, this);
 	readDisclaimers->SetCursor(wxCURSOR_CLOSED_HAND);
 
 	wxBoxSizer* copyrightSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -37,15 +40,31 @@ MainFrame::MainFrame(wxWindow* parent,
 	copyrightSizer->Add(readDisclaimers, wxSizerFlags(0).CenterVertical());
 	copyrightSizer->AddSpacer(40);
 
-	copyrightPanel->SetSizer(copyrightSizer);
+	m_copyrightPanel->SetSizer(copyrightSizer);
 
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+	mainSizer->Add(m_seconPanel, wxSizerFlags(1).Expand());
 	mainSizer->Add(sizer, wxSizerFlags(1).Expand());
-	mainSizer->Add(copyrightPanel, wxSizerFlags(0).Expand());
+	mainSizer->Add(m_copyrightPanel, wxSizerFlags(0).Expand());
 
 	SetSizer(mainSizer);
 }
 
 void MainFrame::LoadPatchNotes() {
-	m_patchNotesWindow->Load();
+	if (!m_patchNotesWindow->Load()) {
+		m_patchNotesWindow->SetMessage("\nCouldn't reach the servers. Please check your internet connection and restart.");
+	}
+}
+
+void MainFrame::OnReadDisclaimer(wxMouseEvent& event) {
+	Freeze();
+
+	m_mainPanel->Hide();
+	m_patchNotesWindow->Hide();
+	m_copyrightPanel->Hide();
+
+	m_seconPanel->Show();
+
+	Layout();
+	Thaw();
 }

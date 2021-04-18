@@ -53,8 +53,6 @@ public:
 	void OnLeaveWindow(wxMouseEvent& event);
 	void OnMouseCaptureLost(wxMouseCaptureLostEvent& event);
 
-	void OnScrollWin(wxScrollWinEvent& event);
-
 	wxDECLARE_EVENT_TABLE();
 };
 

@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BaseClasses.h" />
+    <ClInclude Include="src\FrameButtons.h" />
     <ClInclude Include="src\MainPanel.h" />
     <ClInclude Include="src\PatchNotes.h" />
     <ClInclude Include="src\IsoChecking.h" />
@@ -26,13 +28,17 @@
     <ClInclude Include="src\MainFrame.h" />
     <ClInclude Include="src\MyApp.h" />
     <ClInclude Include="src\Scrollbar.h" />
+    <ClInclude Include="src\SecondaryPanel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BaseClasses.cpp" />
+    <ClCompile Include="src\FrameButtons.cpp" />
     <ClCompile Include="src\MainPanel.cpp" />
     <ClCompile Include="src\PatchNotes.cpp" />
     <ClCompile Include="src\MainFrame.cpp" />
     <ClCompile Include="src\MyApp.cpp" />
     <ClCompile Include="src\Scrollbar.cpp" />
+    <ClCompile Include="src\SecondaryPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
