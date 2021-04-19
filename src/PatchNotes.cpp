@@ -25,7 +25,8 @@ EVT_LEAVE_WINDOW(HyperlinkPanel::OnLeaveWindow)
 wxEND_EVENT_TABLE()
 
 HyperlinkPanel::HyperlinkPanel(wxWindow* parent, const wxString& url, const wxBitmap& bmp, const wxSize& size, const wxPoint& pos, long style) :
-	wxPanel(parent, -1, pos, size, style) {
+	wxPanel(parent, -1, pos, size, style)
+{
 	m_bitmap = bmp;
 	m_url = url;
 	m_bgRatio = (double)m_bitmap.GetWidth() / m_bitmap.GetHeight();
@@ -36,16 +37,19 @@ HyperlinkPanel::HyperlinkPanel(wxWindow* parent, const wxString& url, const wxBi
 	SetCursor(wxCURSOR_CLOSED_HAND);
 }
 
-void HyperlinkPanel::RecalculateSelf() {
+void HyperlinkPanel::RecalculateSelf()
+{
 	wxSize size = GetClientSize();
 	double curRatio = (double)size.x / size.y;
 	int paddingx2 = m_padding * 2;
 
-	if (curRatio > m_bgRatio) {
+	if ( curRatio > m_bgRatio )
+	{
 		m_bgScale = (double)(size.x - paddingx2) / m_bitmap.GetWidth();
 		m_bgx = (((size.x + paddingx2) - ((double)m_bitmap.GetWidth() * m_bgScale)) / 2) / m_bgScale;
 		m_bgy = m_padding;
-	} else {
+	} else
+	{
 		m_bgScale = (double)(size.y - paddingx2) / m_bitmap.GetHeight();
 		m_bgy = (((size.y + paddingx2) - ((double)m_bitmap.GetHeight() * m_bgScale)) / 2) / m_bgScale;
 		m_bgx = m_padding;
@@ -54,11 +58,13 @@ void HyperlinkPanel::RecalculateSelf() {
 	Refresh();
 }
 
-void HyperlinkPanel::OnSize(wxSizeEvent& event) {
+void HyperlinkPanel::OnSize(wxSizeEvent& event)
+{
 	RecalculateSelf();
 }
 
-void HyperlinkPanel::OnPaint(wxPaintEvent& event) {
+void HyperlinkPanel::OnPaint(wxPaintEvent& event)
+{
 	wxAutoBufferedPaintDC dc(this);
 
 	dc.SetPen(*wxTRANSPARENT_PEN);
@@ -70,7 +76,8 @@ void HyperlinkPanel::OnPaint(wxPaintEvent& event) {
 	gdc.DrawBitmap(m_bitmap, m_bgx, m_bgy, true);
 	gdc.GetGraphicsContext()->Scale(1.0 / m_bgScale, 1.0 / m_bgScale);
 
-	if (!m_isHovering) {
+	if ( !m_isHovering )
+	{
 		wxSize size = GetSize();
 		size.x += 20;
 		size.y += 20;
@@ -79,16 +86,19 @@ void HyperlinkPanel::OnPaint(wxPaintEvent& event) {
 	}
 }
 
-void HyperlinkPanel::OnLeftDown(wxMouseEvent& event) {
+void HyperlinkPanel::OnLeftDown(wxMouseEvent& event)
+{
 	wxLaunchDefaultBrowser(m_url);
 }
 
-void HyperlinkPanel::OnEnterWindow(wxMouseEvent& event) {
+void HyperlinkPanel::OnEnterWindow(wxMouseEvent& event)
+{
 	m_isHovering = true;
 	Refresh();
 }
 
-void HyperlinkPanel::OnLeaveWindow(wxMouseEvent& event) {
+void HyperlinkPanel::OnLeaveWindow(wxMouseEvent& event)
+{
 	m_isHovering = false;
 	Refresh();
 }
@@ -105,10 +115,11 @@ EVT_PAINT(LeftSidebar::OnPaint)
 END_EVENT_TABLE()
 
 LeftSidebar::LeftSidebar(wxWindow* parent,
-	wxWindowID id, 
-	const wxPoint& pos, 
-	const wxSize& size, 
-	long style) : wxPanel(parent, id, pos, size, style) {
+	wxWindowID id,
+	const wxPoint& pos,
+	const wxSize& size,
+	long style) : wxPanel(parent, id, pos, size, style)
+{
 	m_mainFrame = (MainFrame*)parent;
 
 	SetBackgroundColour(wxColour(0, 0, 0));
@@ -155,14 +166,17 @@ LeftSidebar::LeftSidebar(wxWindow* parent,
 	SetSizer(sizer);
 }
 
-bool LeftSidebar::Load() {
+bool LeftSidebar::Load()
+{
 	wxFileSystem fs;
 	wxFSFile* file = fs.OpenFile("http://btflgame.com/patch_notes/all.xml");
 
-	if (file) {
+	if ( file )
+	{
 		wxStringInputStream* stream = (wxStringInputStream*)(file->GetStream());
 
-		if (stream->CanRead()) {
+		if ( stream->CanRead() )
+		{
 			wxRichTextBuffer buf;
 			buf.LoadFile(*stream, wxRICHTEXT_TYPE_XML);
 			buf.SetBasicStyle(m_rtc->GetBasicStyle());
@@ -180,13 +194,15 @@ bool LeftSidebar::Load() {
 	return false;
 }
 
-void LeftSidebar::SetMessage(const wxString& message) {
+void LeftSidebar::SetMessage(const wxString& message)
+{
 	m_rtc->SetValue(message);
 }
 
-void LeftSidebar::OnPaint(wxPaintEvent& event) {
+void LeftSidebar::OnPaint(wxPaintEvent& event)
+{
 	wxPaintDC dc(this);
-	
+
 	wxSize size = GetClientSize();
 	wxRect rtcRect(m_rtc->GetRect());
 
@@ -204,6 +220,7 @@ void LeftSidebar::OnPaint(wxPaintEvent& event) {
 	dc.GradientFillLinear(wxRect(wxPoint(middleX, size.y - 1), gradientHalfSize), gray, black);
 }
 
-void LeftSidebar::OnMove(wxMouseEvent& event) {
+void LeftSidebar::OnMove(wxMouseEvent& event)
+{
 
 }

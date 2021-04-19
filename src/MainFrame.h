@@ -8,7 +8,8 @@
 #include "SecondaryPanel.h"
 #include "PatchNotes.h"
 
-class MainFrame : public wxFrame {
+class MainFrame : public wxFrame
+{
 private:
 	MainPanel* m_mainPanel = nullptr;
 	SecondaryPanel* m_seconPanel = nullptr;

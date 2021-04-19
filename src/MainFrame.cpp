@@ -1,12 +1,13 @@
 #include "MainFrame.h"
 
-MainFrame::MainFrame(wxWindow* parent, 
+MainFrame::MainFrame(wxWindow* parent,
 	wxWindowID id,
 	const wxString& title,
 	const wxPoint& pos,
 	const wxSize& size,
-	long style, 
-	const wxString& name) : wxFrame(parent, id, title, pos, size, style, name) {
+	long style,
+	const wxString& name) : wxFrame(parent, id, title, pos, size, style, name)
+{
 	SetIcon(wxICON(aaaaBTFLValusLogoNoText));
 	SetBackgroundColour(wxColour(0, 0, 0));
 
@@ -50,13 +51,16 @@ MainFrame::MainFrame(wxWindow* parent,
 	SetSizer(mainSizer);
 }
 
-void MainFrame::LoadPatchNotes() {
-	if (!m_patchNotesWindow->Load()) {
+void MainFrame::LoadPatchNotes()
+{
+	if ( !m_patchNotesWindow->Load() )
+	{
 		m_patchNotesWindow->SetMessage("\nCouldn't reach the servers. Please check your internet connection and restart.");
 	}
 }
 
-void MainFrame::OnReadDisclaimer(wxMouseEvent& event) {
+void MainFrame::OnReadDisclaimer(wxMouseEvent& event)
+{
 	Freeze();
 
 	m_mainPanel->Hide();

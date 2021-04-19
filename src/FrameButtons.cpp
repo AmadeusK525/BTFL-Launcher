@@ -2,7 +2,8 @@
 
 XS_IMPLEMENT_CLONABLE_CLASS(FrameButtons, wxSFGridShape)
 
-void FrameButtons::Init() {
+void FrameButtons::Init()
+{
 	AcceptChild("All");
 	RemoveStyle(sfsHIGHLIGHTING);
 	RemoveStyle(sfsPOSITION_CHANGE);

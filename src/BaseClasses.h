@@ -10,7 +10,8 @@
 //////////////////////////////////////////////////////////////////
 
 
-class ReadOnlyRTC : public wxRichTextCtrl {
+class ReadOnlyRTC : public wxRichTextCtrl
+{
 	wxBitmap m_shadowBitmap;
 public:
 	ReadOnlyRTC(wxWindow* parent,
@@ -30,7 +31,8 @@ public:
 //////////////////////////////////////////////////////////////////
 
 
-class BackgroundImageCanvas : public wxSFShapeCanvas {
+class BackgroundImageCanvas : public wxSFShapeCanvas
+{
 protected:
 	wxBitmap m_background;
 	int m_bgx = 0, m_bgy = 0,

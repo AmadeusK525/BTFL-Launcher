@@ -11,10 +11,11 @@
 
 class MainPanel;
 
-class TransparentButton : public wxSFRoundRectShape {
+class TransparentButton : public wxSFRoundRectShape
+{
 protected:
 	MainPanel* m_parent = nullptr;
-	
+
 	wxString m_label;
 	wxFont m_font;
 	wxColour m_textColour{ 255,255,255 };
@@ -61,21 +62,23 @@ public:
 //////////////////////////// MainPanel //////////////////////////////
 /////////////////////////////////////////////////////////////////////
 
-enum {
+enum
+{
 	BUTTON_SelectIso,
 	BUTTON_VerifyIso,
 	BUTTON_Install,
 	BUTTON_Play
 };
 
-class MainPanel : public BackgroundImageCanvas {
+class MainPanel : public BackgroundImageCanvas
+{
 private:
 	wxBitmap m_logo;
 	int m_logox = 0, m_logoy = 0;
 
 	wxString m_isoPath;
 
-	wxString m_fileLabel{ "No ISO selected..." }, m_fileDesc{"View Installation Guide"};
+	wxString m_fileLabel{ "No ISO selected..." }, m_fileDesc{ "View Installation Guide" };
 	wxFont m_fileLabelFont{ wxFontInfo(12).FaceName("Times New Roman") },
 		m_fileDescFont{ wxFontInfo(10).FaceName("Times New Roman") };
 	wxRect m_fileDescRect;
@@ -94,7 +97,7 @@ private:
 	FrameButtons* m_frameButtons = nullptr;
 
 public:
-	MainPanel(wxSFDiagramManager* manager, 
+	MainPanel(wxSFDiagramManager* manager,
 		wxWindow* parent,
 		wxWindowID id,
 		const wxPoint& pos = wxDefaultPosition,
@@ -106,7 +109,7 @@ public:
 
 	void OnFrameButtons(wxSFShapeMouseEvent& event);
 	void OnSelectIso(wxSFShapeMouseEvent& event);
-	
+
 	virtual void OnSize(wxSizeEvent& event) override;
 	virtual void OnMouseMove(wxMouseEvent& event) override;
 

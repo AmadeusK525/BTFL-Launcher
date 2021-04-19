@@ -12,7 +12,8 @@
 class SecondaryPanel;
 class MainFrame;
 
-class DisclaimerPanel : public ReadOnlyRTC {
+class DisclaimerPanel : public ReadOnlyRTC
+{
 private:
 	SecondaryPanel* m_seconPanel = nullptr;
 	int m_bgx = 0, m_bgy = 0;
@@ -31,11 +32,13 @@ public:
 	virtual void PaintBackground(wxDC& dc) override;
 };
 
-enum {
+enum
+{
 	BUTTON_Back
 };
 
-class SecondaryPanel : public BackgroundImageCanvas {
+class SecondaryPanel : public BackgroundImageCanvas
+{
 private:
 	MainFrame* m_mainFrame = nullptr;
 

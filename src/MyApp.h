@@ -7,7 +7,8 @@
 
 class MainFrame;
 
-class MyApp : public wxApp {
+class MyApp : public wxApp
+{
 private:
 	MainFrame* m_mainFrame = nullptr;
 

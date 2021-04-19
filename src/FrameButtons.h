@@ -2,13 +2,15 @@
 
 #include <wx\wxsf\wxShapeFramework.h>
 
-enum {
+enum
+{
 	BUTTON_Help,
 	BUTTON_Minimize,
 	BUTTON_Close
 };
 
-class FrameButtons : public wxSFGridShape {
+class FrameButtons : public wxSFGridShape
+{
 public:
 	FrameButtons() = default;
 	void Init();

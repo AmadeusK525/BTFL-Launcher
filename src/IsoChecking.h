@@ -9,16 +9,19 @@
 #include <digestpp.hpp>
 #include "IsoHashes.h"
 
-enum ISO_Region {
+enum ISO_Region
+{
 	ISO_Usa,
 	ISO_Brazil,
 
 	ISO_Invalid
 };
 
-inline bool IsHashFromIso(const wxString& userHash, ISO_Region region) {
+inline bool IsHashFromIso(const wxString& userHash, ISO_Region region)
+{
 	wxString hash;
-	switch (region) {
+	switch ( region )
+	{
 	case ISO_Usa:
 		hash = iso_usa;
 		break;
@@ -30,7 +33,8 @@ inline bool IsHashFromIso(const wxString& userHash, ISO_Region region) {
 	return hash == userHash;
 }
 
-inline wxString GetFileHash(wxFileInputStream* stream) {
+inline wxString GetFileHash(wxFileInputStream* stream)
+{
 	size_t fullLength = stream->GetLength();
 	const size_t READ_LENGTH = 100000000;
 	size_t length = 0;
@@ -39,10 +43,12 @@ inline wxString GetFileHash(wxFileInputStream* stream) {
 
 	digestpp::sha3 hasher(256);
 	int index = 1;
-	
-	while (length < fullLength) {
+
+	while ( length < fullLength )
+	{
 		length += toRead;
-		if (length > fullLength) {
+		if ( length > fullLength )
+		{
 			length -= READ_LENGTH;
 			toRead = fullLength - length;
 		}
@@ -53,21 +59,23 @@ inline wxString GetFileHash(wxFileInputStream* stream) {
 		hasher.absorb(buffer);
 		delete[] buffer;
 	}
-	
+
 	return hasher.hexdigest();
 }
 
-inline bool CheckIsoValidity(const wxString& path) {
+inline bool CheckIsoValidity(const wxString& path)
+{
 	wxProgressDialog progdlg("Verifying iso...", "Please do not close the launcher.");
 	progdlg.Pulse();
 
 	wxFileInputStream userIso(path);
-	if (!userIso.IsOk())
+	if ( !userIso.IsOk() )
 		return false;
 
 	wxString userHash = GetFileHash(&userIso);
-	for (ISO_Region region = ISO_Usa; region != ISO_Invalid; region = (ISO_Region)(region + 1)) {
-		if (IsHashFromIso(userHash, region))
+	for ( ISO_Region region = ISO_Usa; region != ISO_Invalid; region = (ISO_Region)(region + 1) )
+	{
+		if ( IsHashFromIso(userHash, region) )
 			return true;
 	}
 

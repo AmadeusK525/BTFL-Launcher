@@ -5,7 +5,8 @@ ReadOnlyRTC::ReadOnlyRTC(wxWindow* parent,
 	const wxString& value,
 	const wxPoint& pos,
 	const wxSize& size,
-	long style) : wxRichTextCtrl(parent, id, value, pos, size, style) {
+	long style) : wxRichTextCtrl(parent, id, value, pos, size, style)
+{
 	SetCursor(wxCURSOR_DEFAULT);
 	SetTextCursor(wxCURSOR_DEFAULT);
 	Bind(wxEVT_SET_FOCUS, [](wxFocusEvent&) {});
@@ -29,7 +30,8 @@ ReadOnlyRTC::ReadOnlyRTC(wxWindow* parent,
 	m_shadowBitmap.LoadFile("Assets\\Scroll Shadow\\Large@2x.png", wxBITMAP_TYPE_PNG);
 }
 
-void ReadOnlyRTC::PaintAboveContent(wxDC& dc) {
+void ReadOnlyRTC::PaintAboveContent(wxDC& dc)
+{
 	int yo;
 	CalcUnscrolledPosition(0, 0, nullptr, &yo);
 	wxSize size = GetClientSize();
@@ -46,12 +48,13 @@ void ReadOnlyRTC::PaintAboveContent(wxDC& dc) {
 //////////////////////////////////////////////////////////////////
 
 
-BackgroundImageCanvas::BackgroundImageCanvas(wxSFDiagramManager* manager, 
-	wxWindow* parent, 
-	wxWindowID id, 
-	const wxPoint& pos, 
-	const wxSize& size, 
-	long style) : wxSFShapeCanvas(manager, parent, id, pos, size, style), m_bgAnimTimer(this, 1234) {
+BackgroundImageCanvas::BackgroundImageCanvas(wxSFDiagramManager* manager,
+	wxWindow* parent,
+	wxWindowID id,
+	const wxPoint& pos,
+	const wxSize& size,
+	long style) : wxSFShapeCanvas(manager, parent, id, pos, size, style), m_bgAnimTimer(this, 1234)
+{
 	EnableGC(true);
 	SetHoverColour(wxColour(255, 255, 255));
 
@@ -64,16 +67,19 @@ BackgroundImageCanvas::BackgroundImageCanvas(wxSFDiagramManager* manager,
 	Bind(wxEVT_TIMER, &BackgroundImageCanvas::OnBgAnimTimer, this);
 }
 
-void BackgroundImageCanvas::OnSize(wxSizeEvent& event) {
+void BackgroundImageCanvas::OnSize(wxSizeEvent& event)
+{
 	wxSize size = GetSize();
 	double curRatio = (double)size.x / size.y;
 	int overallOffset = MAX_BG_OFFSET * 2;
 
-	if (curRatio > m_bgRatio) {
+	if ( curRatio > m_bgRatio )
+	{
 		m_bgScale = (double)(size.x + overallOffset) / m_background.GetWidth();
 		m_bgy = (double)(((size.y - overallOffset) - ((double)m_background.GetHeight() * m_bgScale)) / 2) / m_bgScale;
 		m_bgx = -MAX_BG_OFFSET;
-	} else {
+	} else
+	{
 		m_bgScale = (double)(size.y + overallOffset) / m_background.GetHeight();
 		m_bgx = (double)(((size.x - overallOffset) - ((double)m_background.GetWidth() * m_bgScale)) / 2) / m_bgScale;
 		m_bgy = -MAX_BG_OFFSET;
@@ -82,18 +88,21 @@ void BackgroundImageCanvas::OnSize(wxSizeEvent& event) {
 	InvalidateVisibleRect();
 }
 
-void BackgroundImageCanvas::DrawBackground(wxDC& dc, bool fromPaint) {
+void BackgroundImageCanvas::DrawBackground(wxDC& dc, bool fromPaint)
+{
 	dc.SetUserScale(m_bgScale, m_bgScale);
 	dc.DrawBitmap(m_background, m_bgx + m_bgxoffset, m_bgy + m_bgyoffset);
 	dc.SetUserScale(1.0, 1.0);
 }
 
-void BackgroundImageCanvas::OnUpdateVirtualSize(wxRect& rect) {
+void BackgroundImageCanvas::OnUpdateVirtualSize(wxRect& rect)
+{
 	rect.SetTopLeft(wxPoint(0, 0));
 	rect.SetSize(GetClientSize());
 }
 
-void BackgroundImageCanvas::OnMouseMove(wxMouseEvent& event) {
+void BackgroundImageCanvas::OnMouseMove(wxMouseEvent& event)
+{
 	wxSize size = GetClientSize();
 	wxPoint pos = event.GetPosition();
 
@@ -104,27 +113,31 @@ void BackgroundImageCanvas::OnMouseMove(wxMouseEvent& event) {
 	wxSFShapeCanvas::OnMouseMove(event);
 }
 
-void BackgroundImageCanvas::OnEnterWindow(wxMouseEvent& event) {
+void BackgroundImageCanvas::OnEnterWindow(wxMouseEvent& event)
+{
 	m_bgAnimTimer.Stop();
 	m_mousePosOnEnter = event.GetPosition();
 }
 
-void BackgroundImageCanvas::OnLeaveWindow(wxMouseEvent& event) {
+void BackgroundImageCanvas::OnLeaveWindow(wxMouseEvent& event)
+{
 	m_bgAnimTimer.Start(1);
 }
 
-void BackgroundImageCanvas::OnBgAnimTimer(wxTimerEvent& event) {
-	if (m_bgxoffset > 1)
+void BackgroundImageCanvas::OnBgAnimTimer(wxTimerEvent& event)
+{
+	if ( m_bgxoffset > 1 )
 		m_bgxoffset -= 2;
-	else if (m_bgxoffset < -1)
+	else if ( m_bgxoffset < -1 )
 		m_bgxoffset += 2;
 
-	if (m_bgyoffset > 1)
+	if ( m_bgyoffset > 1 )
 		m_bgyoffset -= 2;
-	else if (m_bgyoffset < -1)
+	else if ( m_bgyoffset < -1 )
 		m_bgyoffset += 2;
 
-	if ((m_bgxoffset > -2 && m_bgxoffset < 2) && (m_bgyoffset > -2 && m_bgyoffset < 2)) {
+	if ( (m_bgxoffset > -2 && m_bgxoffset < 2) && (m_bgyoffset > -2 && m_bgyoffset < 2) )
+	{
 		m_bgxoffset = 0;
 		m_bgyoffset = 0;
 		m_bgAnimTimer.Stop();
@@ -134,7 +147,8 @@ void BackgroundImageCanvas::OnBgAnimTimer(wxTimerEvent& event) {
 	Update();
 }
 
-void BackgroundImageCanvas::_OnSize(wxSizeEvent& event) {
+void BackgroundImageCanvas::_OnSize(wxSizeEvent& event)
+{
 	this->OnSize(event);
 	event.Skip();
 }

@@ -7,11 +7,13 @@ DisclaimerPanel::DisclaimerPanel(SecondaryPanel* parent,
 	const wxString& value,
 	const wxPoint& pos,
 	const wxSize& size,
-	long style) : ReadOnlyRTC(parent, id, value, pos, size, style) {
+	long style) : ReadOnlyRTC(parent, id, value, pos, size, style)
+{
 	m_seconPanel = parent;
 }
 
-void DisclaimerPanel::PaintBackground(wxDC& dc) {
+void DisclaimerPanel::PaintBackground(wxDC& dc)
+{
 	double scale = m_seconPanel->GetBackgroundScale();
 	int yo;
 	CalcUnscrolledPosition(0, 0, nullptr, &yo);
@@ -35,7 +37,9 @@ EVT_SF_SHAPE_LEFT_DOWN(BUTTON_Close, SecondaryPanel::OnFrameButtons)
 
 wxEND_EVENT_TABLE()
 
-SecondaryPanel::SecondaryPanel(wxSFDiagramManager* manager, MainFrame* parent) : BackgroundImageCanvas(manager, (wxWindow*)parent, -1) {
+SecondaryPanel::SecondaryPanel(wxSFDiagramManager* manager, MainFrame* parent) :
+	BackgroundImageCanvas(manager, (wxWindow*)parent, -1)
+{
 	m_mainFrame = parent;
 
 	MAX_BG_OFFSET = 0;
@@ -86,8 +90,10 @@ void SecondaryPanel::ShowDisclaimer() {}
 
 void SecondaryPanel::ShowSettings() {}
 
-void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event) {
-	switch (event.GetId()) {
+void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
+{
+	switch ( event.GetId() )
+	{
 	case BUTTON_Help:
 		break;
 
@@ -101,13 +107,14 @@ void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event) {
 	}
 }
 
-void SecondaryPanel::RepositionAll() {
+void SecondaryPanel::RepositionAll()
+{
 	wxSize size = GetClientSize();
 	wxRealPoint shapeSize;
 
 	shapeSize = m_frameButtons->GetRectSize();
 	m_frameButtons->MoveTo(size.x - shapeSize.x - 10, 10);
-	
+
 	shapeSize = m_title->GetRectSize();
 	m_title->MoveTo((size.x / 2) - (shapeSize.x / 2), (TOP_SPACE / 2) - (shapeSize.y / 2));
 
@@ -115,20 +122,22 @@ void SecondaryPanel::RepositionAll() {
 	m_backArrow->MoveTo(10, 10);
 }
 
-void SecondaryPanel::DrawForeground(wxDC& dc, bool fromPaint) {
+void SecondaryPanel::DrawForeground(wxDC& dc, bool fromPaint)
+{
 	dc.SetUserScale(m_bgScale, m_bgScale);
 	dc.DrawBitmap(m_topSeparator, 0, 49.0 / m_bgScale, true);
 	dc.SetUserScale(1.0, 1.0);
 }
 
-void SecondaryPanel::OnSize(wxSizeEvent& event) {
+void SecondaryPanel::OnSize(wxSizeEvent& event)
+{
 	BackgroundImageCanvas::OnSize(event);
 	wxPoint disclaimerPos = m_disclaimer->GetPosition();
-	
+
 	// For some reason I need to offset the x component by 15 so it statys aligned.
 	// Might be a quirk with how wxRTC draws itself
 	m_disclaimer->SetBackgroundX(m_bgx - 15 - ((double)disclaimerPos.x / m_bgScale));
 	m_disclaimer->SetBackgroundY(m_bgy - ((double)disclaimerPos.y / m_bgScale));
-	
+
 	RepositionAll();
 }

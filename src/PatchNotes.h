@@ -16,7 +16,8 @@ class MainFrame;
 ///////////////////////////////////////////////////////////////////////
 
 
-class HyperlinkPanel : public wxPanel {
+class HyperlinkPanel : public wxPanel
+{
 	wxBitmap m_bitmap;
 	wxString m_url;
 
@@ -49,7 +50,8 @@ public:
 ///////////////////////////////////////////////////////////////////////
 
 
-class LeftSidebar : public wxPanel {
+class LeftSidebar : public wxPanel
+{
 	MainFrame* m_mainFrame = nullptr;
 	ReadOnlyRTC* m_rtc = nullptr;
 

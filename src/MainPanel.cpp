@@ -9,10 +9,11 @@ XS_IMPLEMENT_CLONABLE_CLASS(TransparentButton, wxSFRoundRectShape);
 
 TransparentButton::TransparentButton(const wxString& label, const wxRealPoint& pos, const wxRealPoint& size,
 	double radius, wxSFDiagramManager* manager) :
-	wxSFRoundRectShape(pos, size, radius, manager) {
+	wxSFRoundRectShape(pos, size, radius, manager)
+{
 	SetFill(wxBrush(wxColour(255, 255, 255, 50)));
 	SetBorder(*wxTRANSPARENT_PEN);
-	
+
 	AddStyle(sfsEMIT_EVENTS);
 
 	RemoveStyle(sfsHIGHLIGHTING);
@@ -23,20 +24,25 @@ TransparentButton::TransparentButton(const wxString& label, const wxRealPoint& p
 	m_label = label;
 }
 
-TransparentButton::TransparentButton(const TransparentButton& other) {
+TransparentButton::TransparentButton(const TransparentButton& other)
+{
 
 }
 
-TransparentButton::~TransparentButton() {
-	if (m_bitmap)
+TransparentButton::~TransparentButton()
+{
+	if ( m_bitmap )
 		delete m_bitmap;
 }
 
-void TransparentButton::Enable(bool enable) {
-	if (enable) {
+void TransparentButton::Enable(bool enable)
+{
+	if ( enable )
+	{
 		AddStyle(sfsEMIT_EVENTS);
 		AddStyle(sfsHOVERING);
-	} else {
+	} else
+	{
 		RemoveStyle(sfsEMIT_EVENTS);
 		RemoveStyle(sfsHOVERING);
 	}
@@ -44,19 +50,24 @@ void TransparentButton::Enable(bool enable) {
 	m_isEnabled = enable;
 }
 
-void TransparentButton::SetLabel(const wxString& label) {
+void TransparentButton::SetLabel(const wxString& label)
+{
 	m_label = label;
 	RecalculateSelf();
 }
 
-void TransparentButton::SetFont(const wxFont& font) {
+void TransparentButton::SetFont(const wxFont& font)
+{
 	m_font = font;
 	RecalculateSelf();
 }
 
-void TransparentButton::SetBitmap(const wxBitmap& bmp) {
-	if (!bmp.IsOk()) {
-		if (m_bitmap) {
+void TransparentButton::SetBitmap(const wxBitmap& bmp)
+{
+	if ( !bmp.IsOk() )
+	{
+		if ( m_bitmap )
+		{
 			delete m_bitmap;
 			m_bitmap = nullptr;
 		}
@@ -64,7 +75,7 @@ void TransparentButton::SetBitmap(const wxBitmap& bmp) {
 		return;
 	}
 
-	if (!m_bitmap)
+	if ( !m_bitmap )
 		m_bitmap = new wxBitmap(bmp);
 	else
 		*m_bitmap = bmp;
@@ -72,19 +83,22 @@ void TransparentButton::SetBitmap(const wxBitmap& bmp) {
 	m_bmpRatio = (double)bmp.GetWidth() / bmp.GetHeight();
 }
 
-void TransparentButton::SetPadding(int x, int y) {
+void TransparentButton::SetPadding(int x, int y)
+{
 	m_xPadding = x;
 	m_yPadding = y;
 }
 
-void TransparentButton::GetPadding(int* x, int* y) {
-	if (x) *x = m_xPadding;
-	if (y) *y = m_yPadding;
+void TransparentButton::GetPadding(int* x, int* y)
+{
+	if ( x ) *x = m_xPadding;
+	if ( y ) *y = m_yPadding;
 }
 
-void TransparentButton::RecalculateSelf(const wxSize& soloBmpSize) {
+void TransparentButton::RecalculateSelf(const wxSize& soloBmpSize)
+{
 	MainPanel* pCanvas = dynamic_cast<MainPanel*>(GetParentCanvas());
-	if (!pCanvas)
+	if ( !pCanvas )
 		return;
 
 	wxClientDC dc(pCanvas);
@@ -92,15 +106,20 @@ void TransparentButton::RecalculateSelf(const wxSize& soloBmpSize) {
 	wxSize size = dc.GetMultiLineTextExtent(m_label);
 	m_xLabel = m_xPadding;
 
-	if (m_bitmap) {
-		if (m_label.IsEmpty()) {
-			if (soloBmpSize != wxDefaultSize) {
+	if ( m_bitmap )
+	{
+		if ( m_label.IsEmpty() )
+		{
+			if ( soloBmpSize != wxDefaultSize )
+			{
 				double curRatio = (double)soloBmpSize.x / soloBmpSize.y;
-				if (curRatio > m_bmpRatio) {
+				if ( curRatio > m_bmpRatio )
+				{
 					m_bmpScale = (double)soloBmpSize.y / m_bitmap->GetHeight();
-					m_xBitmap = (soloBmpSize.x / 2) - ((double)(m_bitmap->GetWidth() * m_bmpScale) / 2) + m_xPadding ;
+					m_xBitmap = (soloBmpSize.x / 2) - ((double)(m_bitmap->GetWidth() * m_bmpScale) / 2) + m_xPadding;
 					m_yBitmap = m_yPadding;
-				} else {
+				} else
+				{
 					m_bmpScale = (double)soloBmpSize.x / m_bitmap->GetWidth();
 					m_yBitmap = (soloBmpSize.y / 2) - (((double)m_bitmap->GetHeight() * m_bmpScale) / 2) + m_yPadding;
 					m_xBitmap = m_xPadding;
@@ -109,7 +128,8 @@ void TransparentButton::RecalculateSelf(const wxSize& soloBmpSize) {
 				size.x = (double)m_bitmap->GetWidth() * m_bmpScale;
 				size.y = (double)m_bitmap->GetHeight() * m_bmpScale;
 			}
-		} else {
+		} else
+		{
 			m_bmpScale = (double)size.y / m_bitmap->GetHeight();
 			m_yBitmap = m_yPadding;
 			m_xBitmap = m_xPadding;
@@ -123,20 +143,22 @@ void TransparentButton::RecalculateSelf(const wxSize& soloBmpSize) {
 	SetRectSize(size.x + (m_xPadding * 2), size.y + (m_yPadding * 2));
 }
 
-void TransparentButton::DrawContent(wxDC& dc, bool isHovering) {
+void TransparentButton::DrawContent(wxDC& dc, bool isHovering)
+{
 	dc.SetFont(m_font);
 	dc.SetTextForeground(m_textColour);
 	wxRealPoint absolutePos = GetAbsolutePosition();
 
 	dc.DrawText(m_label, absolutePos + wxRealPoint(m_xLabel, m_yPadding));
 
-	if (m_bitmap) {
+	if ( m_bitmap )
+	{
 		dc.SetUserScale(m_bmpScale, m_bmpScale);
 		wxRealPoint bmpPos = (absolutePos + wxRealPoint(m_xBitmap, m_yBitmap));
 		bmpPos.x /= m_bmpScale;
 		bmpPos.y /= m_bmpScale;
 
-		if (isHovering)
+		if ( isHovering )
 			dc.DrawBitmap(m_bitmap->ConvertToDisabled(0), bmpPos, true);
 		else
 			dc.DrawBitmap(*m_bitmap, bmpPos, true);
@@ -145,12 +167,14 @@ void TransparentButton::DrawContent(wxDC& dc, bool isHovering) {
 	}
 }
 
-void TransparentButton::DrawNormal(wxDC& dc) {
+void TransparentButton::DrawNormal(wxDC& dc)
+{
 	wxSFRoundRectShape::DrawNormal(dc);
 	DrawContent(dc, false);
 }
 
-void TransparentButton::DrawHover(wxDC& dc) {
+void TransparentButton::DrawHover(wxDC& dc)
+{
 	wxBrush fillCache = GetFill();
 	wxColour textColourCache = m_textColour;
 
@@ -184,7 +208,8 @@ MainPanel::MainPanel(wxSFDiagramManager* manager,
 	wxWindowID id,
 	const wxPoint& pos,
 	const wxSize& size,
-	long style) : BackgroundImageCanvas(manager, parent, id, pos, size, style) {
+	long style) : BackgroundImageCanvas(manager, parent, id, pos, size, style)
+{
 	m_background.LoadFile("Assets\\Background\\Main Page Roc@2x.png", wxBITMAP_TYPE_PNG);
 	m_logo.LoadFile("Assets\\LauncherLogo.png", wxBITMAP_TYPE_PNG);
 	m_bgRatio = (double)m_background.GetWidth() / m_background.GetHeight();
@@ -205,17 +230,18 @@ MainPanel::MainPanel(wxSFDiagramManager* manager,
 	m_configButton->SetBitmap(wxBitmap("Assets\\Icon\\Settings@2x.png", wxBITMAP_TYPE_PNG));
 	m_configButton->SetPadding(15, 15);
 	manager->AddShape(m_configButton, nullptr, wxDefaultPosition, true, false);
-	
+
 	m_frameButtons = (FrameButtons*)manager->AddShape(CLASSINFO(FrameButtons), false);
 	m_frameButtons->Init();
 }
 
-void MainPanel::RepositionAll() {
+void MainPanel::RepositionAll()
+{
 	wxSize size = GetClientSize();
 
 	m_mainButton->RecalculateSelf();
 	wxRealPoint shapeSize = m_mainButton->GetRectSize();
-	
+
 	m_mainButton->MoveTo(40, size.y - shapeSize.y - 40);
 	wxRect shapeBB = m_mainButton->GetBoundingBox();
 
@@ -245,8 +271,10 @@ void MainPanel::RepositionAll() {
 	m_fileDescRect = { wxPoint(m_xFDesc, m_yFDesc), textSize };
 }
 
-void MainPanel::OnFrameButtons(wxSFShapeMouseEvent& event) {
-	switch (event.GetId()) {
+void MainPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
+{
+	switch ( event.GetId() )
+	{
 	case BUTTON_Help:
 		break;
 
@@ -263,13 +291,14 @@ void MainPanel::OnFrameButtons(wxSFShapeMouseEvent& event) {
 	}
 }
 
-void MainPanel::OnSelectIso(wxSFShapeMouseEvent& event) {
+void MainPanel::OnSelectIso(wxSFShapeMouseEvent& event)
+{
 	wxFileDialog fileDialog(nullptr, _("Please select an original Shadow Of The Colossus ISO file..."),
 		"", "", "ISO files (*.iso)|*.iso", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-	if (fileDialog.ShowModal() == wxID_CANCEL)
+	if ( fileDialog.ShowModal() == wxID_CANCEL )
 		return;
-	
+
 	Freeze();
 
 	wxFileName fileName(fileDialog.GetPath());
@@ -282,14 +311,15 @@ void MainPanel::OnSelectIso(wxSFShapeMouseEvent& event) {
 	m_fileBmp.LoadFile("Assets\\Icon\\Folder@2x.png", wxBITMAP_TYPE_PNG);
 	m_mainButton->SetLabel("VERIFY ISO");
 	m_mainButton->SetId(BUTTON_VerifyIso);
-	
+
 	RepositionAll();
 	Thaw();
 
 	m_fileDescRect = { -1,-1,-1,-1 };
 }
 
-void MainPanel::DrawForeground(wxDC& dc, bool fromPaint) {
+void MainPanel::DrawForeground(wxDC& dc, bool fromPaint)
+{
 	dc.DrawBitmap(m_logo, m_logox, m_logoy);
 
 	dc.SetTextForeground(wxColour(255, 255, 255));
@@ -306,7 +336,8 @@ void MainPanel::DrawForeground(wxDC& dc, bool fromPaint) {
 	dc.SetUserScale(1.0, 1.0);
 }
 
-void MainPanel::OnSize(wxSizeEvent& event) {
+void MainPanel::OnSize(wxSizeEvent& event)
+{
 	BackgroundImageCanvas::OnSize(event);
 	m_logox = (event.GetSize().x / 2) - (m_logo.GetWidth() / 2);
 	m_logoy = 70;
@@ -314,11 +345,13 @@ void MainPanel::OnSize(wxSizeEvent& event) {
 	RepositionAll();
 }
 
-void MainPanel::OnMouseMove(wxMouseEvent& event) {
+void MainPanel::OnMouseMove(wxMouseEvent& event)
+{
 	BackgroundImageCanvas::OnMouseMove(event);
 
 	bool isHoveringFileDesc = m_fileDescRect.Contains(event.GetPosition());
-	if (isHoveringFileDesc != m_isHoveringFileDesc) {
+	if ( isHoveringFileDesc != m_isHoveringFileDesc )
+	{
 		SetCursor((wxStockCursor)((wxCURSOR_DEFAULT * !isHoveringFileDesc) + (wxCURSOR_CLOSED_HAND * isHoveringFileDesc)));
 		m_isHoveringFileDesc = isHoveringFileDesc;
 	}

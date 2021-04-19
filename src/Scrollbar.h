@@ -6,16 +6,18 @@
 #include <wx\generic\scrolwin.h>
 #include <wx\richtext\richtextctrl.h>
 
-enum  {
+enum
+{
 	TIMER_SetOffOnHold,
 	TIMER_ScrollOnHold
 };
 
-class CustomRTCScrollbar : public wxControl {
+class CustomRTCScrollbar : public wxControl
+{
 private:
 	wxRichTextCtrl* m_rtc = nullptr;
 	int m_orientation = wxVERTICAL;
-	
+
 	double m_ratio = 1.0;
 	double m_borderRadius = 2.0;
 
