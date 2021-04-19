@@ -1,5 +1,6 @@
 #include "SecondaryPanel.h"
 #include "Scrollbar.h"
+#include "MyApp.h"
 
 DisclaimerPanel::DisclaimerPanel(SecondaryPanel* parent,
 	wxWindowID id,
@@ -26,12 +27,39 @@ void DisclaimerPanel::PaintBackground(wxDC& dc) {
 /////////////////////////////////////////////////////////////////////////
 
 
-SecondaryPanel::SecondaryPanel(wxSFDiagramManager* manager, wxWindow* parent) : BackgroundImageCanvas(manager, parent, -1) {
+wxBEGIN_EVENT_TABLE(SecondaryPanel, BackgroundImageCanvas)
+
+EVT_SF_SHAPE_LEFT_DOWN(BUTTON_Help, SecondaryPanel::OnFrameButtons)
+EVT_SF_SHAPE_LEFT_DOWN(BUTTON_Minimize, SecondaryPanel::OnFrameButtons)
+EVT_SF_SHAPE_LEFT_DOWN(BUTTON_Close, SecondaryPanel::OnFrameButtons)
+
+wxEND_EVENT_TABLE()
+
+SecondaryPanel::SecondaryPanel(wxSFDiagramManager* manager, MainFrame* parent) : BackgroundImageCanvas(manager, (wxWindow*)parent, -1) {
+	m_mainFrame = parent;
+
 	MAX_BG_OFFSET = 0;
 	m_background.LoadFile("Assets\\Background\\Subpage@2x.png", wxBITMAP_TYPE_PNG);
 	m_bgRatio = (double)m_background.GetWidth() / m_background.GetHeight();
 
+	manager->AcceptShape("All");
+
 	m_topSeparator.LoadFile("Assets\\Spacer\\Full Window Width@2x.png", wxBITMAP_TYPE_PNG);
+
+	m_backArrow = (wxSFBitmapShape*)manager->AddShape(CLASSINFO(wxSFBitmapShape), false);
+	m_backArrow->CreateFromFile("Assets\\Icon\\Arrow Left.png", wxBITMAP_TYPE_PNG);
+	m_backArrow->SetId(BUTTON_Back);
+	m_backArrow->SetStyle(
+		wxSFShapeBase::STYLE::sfsHOVERING |
+		wxSFShapeBase::STYLE::sfsEMIT_EVENTS
+	);
+
+	m_title = (wxSFTextShape*)manager->AddShape(CLASSINFO(wxSFTextShape), false);
+	m_title->SetText("DISCLAIMER");
+	m_title->SetTextColour(wxColour(255, 255, 255));
+	m_title->SetFont(wxFontInfo(15).Bold().FaceName("Times New Roman"));
+	m_title->SetStyle(0);
+
 	m_frameButtons = (FrameButtons*)manager->AddShape(CLASSINFO(FrameButtons), false);
 	m_frameButtons->Init();
 
@@ -46,9 +74,9 @@ SecondaryPanel::SecondaryPanel(wxSFDiagramManager* manager, wxWindow* parent) : 
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->AddStretchSpacer(1);
-	sizer->Add(m_disclaimer, wxSizerFlags(0).Expand().Border(wxTOP, 50));
+	sizer->Add(m_disclaimer, wxSizerFlags(0).Expand().Border(wxTOP, TOP_SPACE));
 	sizer->AddStretchSpacer(1);
-	sizer->Add(scrollbar, wxSizerFlags(0).Expand().Border(wxTOP, 50));
+	sizer->Add(scrollbar, wxSizerFlags(0).Expand().Border(wxTOP, TOP_SPACE));
 	sizer->AddSpacer(20);
 
 	SetSizer(sizer);
@@ -58,9 +86,33 @@ void SecondaryPanel::ShowDisclaimer() {}
 
 void SecondaryPanel::ShowSettings() {}
 
+void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event) {
+	switch (event.GetId()) {
+	case BUTTON_Help:
+		break;
+
+	case BUTTON_Minimize:
+		((wxFrame*)wxGetApp().GetTopWindow())->Iconize();
+		break;
+
+	case BUTTON_Close:
+		wxGetApp().GetTopWindow()->Close();
+		break;
+	}
+}
+
 void SecondaryPanel::RepositionAll() {
 	wxSize size = GetClientSize();
-	m_frameButtons->MoveTo(size.x - m_frameButtons->GetRectSize().x - 10, 10);
+	wxRealPoint shapeSize;
+
+	shapeSize = m_frameButtons->GetRectSize();
+	m_frameButtons->MoveTo(size.x - shapeSize.x - 10, 10);
+	
+	shapeSize = m_title->GetRectSize();
+	m_title->MoveTo((size.x / 2) - (shapeSize.x / 2), (TOP_SPACE / 2) - (shapeSize.y / 2));
+
+	shapeSize = m_backArrow->GetRectSize();
+	m_backArrow->MoveTo(10, 10);
 }
 
 void SecondaryPanel::DrawForeground(wxDC& dc, bool fromPaint) {
@@ -77,6 +129,6 @@ void SecondaryPanel::OnSize(wxSizeEvent& event) {
 	// Might be a quirk with how wxRTC draws itself
 	m_disclaimer->SetBackgroundX(m_bgx - 15 - ((double)disclaimerPos.x / m_bgScale));
 	m_disclaimer->SetBackgroundY(m_bgy - ((double)disclaimerPos.y / m_bgScale));
-
+	
 	RepositionAll();
 }

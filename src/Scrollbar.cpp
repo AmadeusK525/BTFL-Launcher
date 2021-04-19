@@ -57,6 +57,19 @@ void CustomRTCScrollbar::RecalculateSelf() {
 	wxSize rtcSize = m_rtc->GetClientSize();
 	wxSize rtcVirtualSize = m_rtc->GetVirtualSize();
 
+	if (rtcVirtualSize.y < rtcSize.y || rtcVirtualSize.x < rtcSize.x) {
+		if (IsShown())
+			Hide();
+
+		return;
+	} else {
+		if (!IsShown()) {
+			Show();
+			if (m_parent)
+				m_parent->Layout();
+		}
+	}
+
 	if (m_orientation == wxVERTICAL) {
 		m_ratio = (double)size.y / rtcVirtualSize.y;
 
@@ -66,18 +79,8 @@ void CustomRTCScrollbar::RecalculateSelf() {
 		m_currentThumbRect = wxRect(0, m_currentPos, size.x, (int)(rtcSize.y * m_ratio));
 	}
 
-	if (rtcVirtualSize.y < rtcSize.y || rtcVirtualSize.x < rtcSize.x) {
-		if (IsShown())
-			Hide();
-	} else {
-		if (!IsShown()) {
-			Show();
-			if (m_parent)
-				m_parent->Layout();
-		}
-		Refresh();
-		Update();
-	}
+	Refresh();
+	Update();
 }
 
 void CustomRTCScrollbar::DoScroll(int pos) {
