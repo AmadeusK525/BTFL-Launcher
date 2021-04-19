@@ -29,6 +29,7 @@
     <ClInclude Include="src\MyApp.h" />
     <ClInclude Include="src\Scrollbar.h" />
     <ClInclude Include="src\SecondaryPanel.h" />
+    <ClInclude Include="src\TransparentButton.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseClasses.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="src\MyApp.cpp" />
     <ClCompile Include="src\Scrollbar.cpp" />
     <ClCompile Include="src\SecondaryPanel.cpp" />
+    <ClCompile Include="src\TransparentButton.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

@@ -5,6 +5,7 @@
 #include "BaseClasses.h"
 #include "PatchNotes.h"
 #include "FrameButtons.h"
+#include "TransparentButton.h"
 
 #include <wx\wxsf\wxShapeFramework.h>
 #include <wx\richtext\richtextctrl.h>
@@ -34,7 +35,10 @@ public:
 
 enum
 {
-	BUTTON_Back
+	BUTTON_Back,
+
+	BUTTON_DisclaimerDecline,
+	BUTTON_DisclaimerAgree
 };
 
 class SecondaryPanel : public BackgroundImageCanvas
@@ -42,14 +46,20 @@ class SecondaryPanel : public BackgroundImageCanvas
 private:
 	MainFrame* m_mainFrame = nullptr;
 
-	DisclaimerPanel* m_disclaimer = nullptr;
 	FrameButtons* m_frameButtons = nullptr;
 	wxSFTextShape* m_title = nullptr;
 	wxSFBitmapShape* m_backArrow = nullptr;
 
-	const int TOP_SPACE = 50;
-
 	wxBitmap m_topSeparator;
+
+	const int TOP_SPACE = 50;
+	const int BOTTOM_SPACE = 100;
+
+	wxBoxSizer* m_verSizer = nullptr;
+
+	DisclaimerPanel* m_disclaimer = nullptr;
+	TransparentButton* m_disDecline = nullptr,
+		* m_disAgree = nullptr;
 
 public:
 	SecondaryPanel(wxSFDiagramManager* manager, MainFrame* parent);

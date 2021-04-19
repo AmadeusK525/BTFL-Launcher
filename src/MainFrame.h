@@ -19,6 +19,8 @@ private:
 	LeftSidebar* m_patchNotesWindow = nullptr;
 	wxPanel* m_copyrightPanel = nullptr;
 
+	bool m_hasUserAgreed = false;
+
 public:
 	MainFrame(wxWindow* parent,
 		wxWindowID id,
@@ -30,6 +32,12 @@ public:
 
 	void LoadPatchNotes();
 
+	void ShowMainPanel();
+	void ShowSecondaryPanel();
+	void ShowDisclaimer();
+	void ShowSettings();
+
+	bool HasUserAgreedToDisclaimer() { return m_hasUserAgreed; }
 	void OnReadDisclaimer(wxMouseEvent& event);
 
 	inline const wxBitmap& GetBackgroundBitmap() { return m_mainPanel->GetBackgroundBitmap(); }

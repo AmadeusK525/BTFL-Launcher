@@ -59,16 +59,52 @@ void MainFrame::LoadPatchNotes()
 	}
 }
 
-void MainFrame::OnReadDisclaimer(wxMouseEvent& event)
+void MainFrame::ShowMainPanel()
 {
 	Freeze();
 
+	m_mainPanel->Show();
+	m_patchNotesWindow->Show();
+	m_copyrightPanel->Show();
+
+	m_seconPanel->Hide();
+	Layout();
+
+	Thaw();
+}
+
+void MainFrame::ShowSecondaryPanel()
+{
+	Freeze();
+	
 	m_mainPanel->Hide();
 	m_patchNotesWindow->Hide();
 	m_copyrightPanel->Hide();
 
 	m_seconPanel->Show();
-
 	Layout();
+
 	Thaw();
+}
+
+void MainFrame::ShowDisclaimer()
+{
+	Freeze();
+	ShowSecondaryPanel();
+	m_seconPanel->ShowDisclaimer();
+	Thaw();
+}
+
+void MainFrame::ShowSettings()
+{
+	Freeze();
+	ShowSecondaryPanel();
+	m_seconPanel->ShowSettings();
+	Thaw();
+}
+
+void MainFrame::OnReadDisclaimer(wxMouseEvent& event)
+{
+	wxBusyCursor cursor;
+	ShowDisclaimer();
 }

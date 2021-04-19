@@ -65,13 +65,13 @@ void CustomRTCScrollbar::RecalculateSelf()
 			Hide();
 
 		return;
-	} else
+	}
+	else
 	{
 		if ( !IsShown() )
 		{
 			Show();
-			if ( m_parent )
-				m_parent->Layout();
+			SendSizeEventToParent();
 		}
 	}
 

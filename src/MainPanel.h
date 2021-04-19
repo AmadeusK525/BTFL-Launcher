@@ -8,62 +8,14 @@
 #include "BaseClasses.h"
 #include "PatchNotes.h"
 #include "FrameButtons.h"
+#include "TransparentButton.h"
 
-class MainPanel;
-
-class TransparentButton : public wxSFRoundRectShape
-{
-protected:
-	MainPanel* m_parent = nullptr;
-
-	wxString m_label;
-	wxFont m_font;
-	wxColour m_textColour{ 255,255,255 };
-
-	int m_xPadding = 30, m_yPadding = 15;
-	int m_xLabel = 30;
-
-	wxBitmap* m_bitmap = nullptr;
-	double m_bmpScale = 1.0, m_bmpRatio = 1.0;
-	int m_xBitmap = 30, m_yBitmap;
-
-	bool m_isEnabled = true;
-
-public:
-	XS_DECLARE_CLONABLE_CLASS(TransparentButton);
-	TransparentButton() = default;
-	TransparentButton(const wxString& label, const wxRealPoint& pos, const wxRealPoint& size,
-		double radius, wxSFDiagramManager* manager);
-	TransparentButton(const TransparentButton& other);
-
-	virtual ~TransparentButton();
-
-	void Enable(bool enable);
-
-	void SetLabel(const wxString& label);
-	void SetFont(const wxFont& font);
-	void SetBitmap(const wxBitmap& bmp);
-
-	void SetPadding(int x, int y);
-	void GetPadding(int* x, int* y);
-	void RecalculateSelf(const wxSize& soloBmpSize = wxDefaultSize);
-
-	void DrawContent(wxDC& dc, bool isHovering);
-
-	virtual void DrawNormal(wxDC& dc);
-	virtual void DrawHover(wxDC& dc);
-
-	inline virtual void OnMouseEnter(const wxPoint& pos) override { GetParentCanvas()->SetCursor(wxCURSOR_CLOSED_HAND); }
-	inline virtual void OnMouseLeave(const wxPoint& pos) override { GetParentCanvas()->SetCursor(wxCURSOR_DEFAULT); }
-};
-
-
-/////////////////////////////////////////////////////////////////////
-//////////////////////////// MainPanel //////////////////////////////
-/////////////////////////////////////////////////////////////////////
+class MainFrame;
 
 enum
 {
+	BUTTON_Settings,
+
 	BUTTON_SelectIso,
 	BUTTON_VerifyIso,
 	BUTTON_Install,
@@ -73,6 +25,8 @@ enum
 class MainPanel : public BackgroundImageCanvas
 {
 private:
+	MainFrame* m_mainFrame = nullptr;
+
 	wxBitmap m_logo;
 	int m_logox = 0, m_logoy = 0;
 
@@ -98,7 +52,7 @@ private:
 
 public:
 	MainPanel(wxSFDiagramManager* manager,
-		wxWindow* parent,
+		MainFrame* parent,
 		wxWindowID id,
 		const wxPoint& pos = wxDefaultPosition,
 		const wxSize& size = wxDefaultSize,
@@ -109,6 +63,8 @@ public:
 
 	void OnFrameButtons(wxSFShapeMouseEvent& event);
 	void OnSelectIso(wxSFShapeMouseEvent& event);
+	void OnVerifyIso(wxSFShapeMouseEvent& event);
+	void OnSettings(wxSFShapeMouseEvent& event);
 
 	virtual void OnSize(wxSizeEvent& event) override;
 	virtual void OnMouseMove(wxMouseEvent& event) override;

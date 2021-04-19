@@ -4,7 +4,7 @@
 
 enum
 {
-	BUTTON_Help,
+	BUTTON_Help = 123456,
 	BUTTON_Minimize,
 	BUTTON_Close
 };
