@@ -1,5 +1,7 @@
 #include "FrameButtons.h"
 
+#include "wxmemdbg.h"
+
 XS_IMPLEMENT_CLONABLE_CLASS(FrameButtons, wxSFGridShape)
 
 void FrameButtons::Init()

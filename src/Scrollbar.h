@@ -18,16 +18,17 @@ private:
 	wxRichTextCtrl* m_rtc = nullptr;
 	int m_orientation = wxVERTICAL;
 
-	double m_ratio = 1.0;
-	double m_borderRadius = 2.0;
+	double m_dPrivateScale = 1.0;
+	double m_dRatio = 1.0;
+	double m_dBorderRadius = 2.0;
 
 	wxRect m_currentThumbRect;
-	int m_currentPos = 0;
-	int m_minWidth = 5;
+	int m_nCurrentPos = 0;
+	int m_nMinWidth = 5;
 
-	int m_barWidth = 1;
-	bool m_isDragging = false;
-	int m_dragOffset = 0;
+	int m_nBarWidth = 1;
+	bool m_bIsDragging = false;
+	int m_nDragOffset = 0;
 
 	wxTimer m_setOffOnHold;
 	wxTimer m_scrollOnHold;

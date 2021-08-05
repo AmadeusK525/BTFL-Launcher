@@ -1,5 +1,7 @@
 #include "BaseClasses.h"
 
+#include "wxmemdbg.h"
+
 ReadOnlyRTC::ReadOnlyRTC(wxWindow* parent,
 	wxWindowID id,
 	const wxString& value,
@@ -53,7 +55,7 @@ BackgroundImageCanvas::BackgroundImageCanvas(wxSFDiagramManager* manager,
 	wxWindowID id,
 	const wxPoint& pos,
 	const wxSize& size,
-	long style) : wxSFShapeCanvas(manager, parent, id, pos, size, style), m_bgAnimTimer(this, 1234)
+	long style) : wxSFShapeCanvas(manager, parent, id, pos, size, style)
 {
 	EnableGC(true);
 	SetHoverColour(wxColour(255, 255, 255));
@@ -64,7 +66,9 @@ BackgroundImageCanvas::BackgroundImageCanvas(wxSFDiagramManager* manager,
 	Bind(wxEVT_SIZE, &BackgroundImageCanvas::_OnSize, this);
 	Bind(wxEVT_ENTER_WINDOW, &BackgroundImageCanvas::OnEnterWindow, this);
 	Bind(wxEVT_LEAVE_WINDOW, &BackgroundImageCanvas::OnLeaveWindow, this);
-	Bind(wxEVT_TIMER, &BackgroundImageCanvas::OnBgAnimTimer, this);
+
+	m_bgAnimTimer.SetOwner(&m_bgAnimTimer, TIMER_Background);
+	m_bgAnimTimer.Bind(wxEVT_TIMER, &BackgroundImageCanvas::OnBgAnimTimer, this);
 }
 
 void BackgroundImageCanvas::OnSize(wxSizeEvent& event)
@@ -121,6 +125,13 @@ void BackgroundImageCanvas::OnEnterWindow(wxMouseEvent& event)
 
 void BackgroundImageCanvas::OnLeaveWindow(wxMouseEvent& event)
 {
+	// Do this so that the canvas unhovers any shape that it
+	// thinks is still under the mouse
+	wxPoint posCache = event.GetPosition();
+	event.SetPosition(wxPoint(0, 0));
+	wxSFShapeCanvas::OnMouseMove(event);
+	event.SetPosition(posCache);
+
 	m_bgAnimTimer.Start(1);
 }
 

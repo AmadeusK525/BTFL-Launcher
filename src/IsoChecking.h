@@ -4,81 +4,87 @@
 
 #include <wx\wx.h>
 #include <wx\wfstream.h>
-#include <wx\progdlg.h>
 
 #include <digestpp.hpp>
 #include "IsoHashes.h"
 
-enum ISO_Region
+namespace iso
 {
-	ISO_Usa,
-	ISO_Brazil,
-
-	ISO_Invalid
-};
-
-inline bool IsHashFromIso(const wxString& userHash, ISO_Region region)
-{
-	wxString hash;
-	switch ( region )
+	const int NUMBER_OF_ISOS = 2;
+	enum ISO_Region
 	{
-	case ISO_Usa:
-		hash = iso_usa;
-		break;
+		ISO_Usa,
+		ISO_Brazil,
 
-	default:
-		break;
-	}
+		ISO_Invalid
+	};
 
-	return hash == userHash;
-}
-
-inline wxString GetFileHash(wxFileInputStream* stream)
-{
-	size_t fullLength = stream->GetLength();
-	const size_t READ_LENGTH = 100000000;
-	size_t length = 0;
-	size_t toRead = READ_LENGTH;
-	char* buffer;
-
-	digestpp::sha3 hasher(256);
-	int index = 1;
-
-	while ( length < fullLength )
+	inline bool IsHashFromIso(const wxString& userHash, ISO_Region region)
 	{
-		length += toRead;
-		if ( length > fullLength )
+		wxString hash;
+		switch ( region )
 		{
-			length -= READ_LENGTH;
-			toRead = fullLength - length;
+		case ISO_Usa:
+			hash = iso_usa;
+			break;
+
+		case ISO_Brazil:
+			break;
+
+		case ISO_Invalid:
+			break;
 		}
 
-		buffer = new char[toRead];
-		stream->Read(buffer, toRead);
-
-		hasher.absorb(buffer);
-		delete[] buffer;
+		return hash == userHash;
 	}
 
-	return hasher.hexdigest();
-}
-
-inline bool CheckIsoValidity(const wxString& path)
-{
-	wxProgressDialog progdlg("Verifying iso...", "Please do not close the launcher.");
-	progdlg.Pulse();
-
-	wxFileInputStream userIso(path);
-	if ( !userIso.IsOk() )
-		return false;
-
-	wxString userHash = GetFileHash(&userIso);
-	for ( ISO_Region region = ISO_Usa; region != ISO_Invalid; region = (ISO_Region)(region + 1) )
+	inline wxString GetFileHash(const wxString& filePath)
 	{
-		if ( IsHashFromIso(userHash, region) )
-			return true;
+		wxFileInputStream stream(filePath);
+		if ( !stream.IsOk() )
+			return "";
+
+		size_t fullLength = stream.GetLength();
+		const size_t READ_LENGTH = 100000000;
+		size_t length = 0;
+		size_t toRead = READ_LENGTH;
+		char* buffer;
+
+		digestpp::sha3 hasher(256);
+		int index = 1;
+
+		while ( length < fullLength )
+		{
+			length += toRead;
+			if ( length > fullLength )
+			{
+				length -= READ_LENGTH;
+				toRead = fullLength - length;
+			}
+
+			buffer = new char[toRead];
+			stream.Read(buffer, toRead);
+
+			hasher.absorb(buffer);
+			delete[] buffer;
+		}
+
+		return hasher.hexdigest();
 	}
 
-	return false;
-}
+	// Currently unused
+	inline ISO_Region CheckIsoValidity(const wxString& path)
+	{
+		wxString userHash = GetFileHash(path);
+		for ( ISO_Region region = ISO_Usa; region != ISO_Invalid; region = (ISO_Region)(region + 1) )
+		{
+			if ( IsHashFromIso(userHash, region) )
+				return region;
+		}
+
+		return ISO_Invalid;
+	}
+
+};
+
 #endif

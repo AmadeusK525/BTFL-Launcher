@@ -1,5 +1,7 @@
 #include "TransparentButton.h"
 
+#include "wxmemdbg.h"
+
 XS_IMPLEMENT_CLONABLE_CLASS(TransparentButton, wxSFRoundRectShape);
 
 TransparentButton::TransparentButton(const wxString& label, const wxRealPoint& pos, const wxRealPoint& size,

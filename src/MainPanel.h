@@ -3,6 +3,7 @@
 #pragma once
 
 #include <wx\wx.h>
+#include <wx\filename.h>
 #include <wx\wxsf\wxShapeFramework.h>
 
 #include "BaseClasses.h"
@@ -11,6 +12,38 @@
 #include "TransparentButton.h"
 
 class MainFrame;
+class CustomGauge;
+
+class CustomGauge : public wxSFRoundRectShape
+{
+private:
+	int m_units = 100;
+	int m_currentUnit = 0;
+
+	wxColour m_barColour = { 52, 199, 226 };
+
+public:
+	CustomGauge() = default;
+	inline CustomGauge(const wxRealPoint& pos,
+		const wxRealPoint& size, 
+		int maxUnits,
+		double radius,
+		wxSFDiagramManager* manager) 
+		: wxSFRoundRectShape(pos, size, radius, manager), m_units(maxUnits) 
+	{
+		SetStyle(sfsHOVERING);
+	}
+
+	bool UpdateValue(int currentUnit);
+
+	inline int GetCurrentUnit() { return m_currentUnit; }
+	inline int GetCurrentPercent() { return (m_currentUnit * 100) / m_units; }
+
+	void DrawBar(wxDC& dc);
+
+	virtual void DrawNormal(wxDC& dc) override;
+	virtual void DrawHover(wxDC& dc) override;
+};
 
 enum
 {
@@ -19,7 +52,17 @@ enum
 	BUTTON_SelectIso,
 	BUTTON_VerifyIso,
 	BUTTON_Install,
-	BUTTON_Play
+	BUTTON_Play,
+
+	TIMER_Gauge
+};
+
+enum GaugeResult
+{
+	GAUGE_VerifyValid,
+	GAUGE_VerifyInvalid,
+
+	GAUGE_Invalid
 };
 
 class MainPanel : public BackgroundImageCanvas
@@ -30,7 +73,7 @@ private:
 	wxBitmap m_logo;
 	int m_logox = 0, m_logoy = 0;
 
-	wxString m_isoPath;
+	wxFileName m_iso;
 
 	wxString m_fileLabel{ "No ISO selected..." }, m_fileDesc{ "View Installation Guide" };
 	wxFont m_fileLabelFont{ wxFontInfo(12).FaceName("Times New Roman") },
@@ -50,6 +93,14 @@ private:
 		* m_configButton = nullptr;
 	FrameButtons* m_frameButtons = nullptr;
 
+	CustomGauge* m_gauge = nullptr;
+	wxSFTextShape* m_gaugeLabel = nullptr,
+		* m_gaugeProgress = nullptr;
+	wxTimer m_gaugeTimer;
+	int m_nextGaugeValue;
+	wxString m_nextGaugeLabel;
+	GaugeResult m_gaugeResult = GAUGE_Invalid;
+
 public:
 	MainPanel(wxSFDiagramManager* manager,
 		MainFrame* parent,
@@ -59,8 +110,31 @@ public:
 		long style = wxBORDER_NONE);
 
 	inline const wxBitmap& GetBackgroundBitmap() { return m_background; }
+
+	// Put everything in place, be it buttons, labels, bitmaps, etc.
 	void RepositionAll();
 
+	inline wxFileName GetISOFile() { return m_iso; }
+
+	// Start the iso verification process. Only works if m_iso is valid.
+	void VerifyIso();
+
+	void CreateGauge();
+	void DestroyGauge();
+
+	// Updates the gauge and refreshes the screen. "Message" is assiged to m_gaugeLabel.
+	void UpdateGauge(int currentUnit, const wxString& message);
+
+	// Called every 1ms so that the program checks whether it needs to update the gauge
+	// with the value specified in m_nextGaugeValue.
+	void OnGaugeTimer(wxTimerEvent& event);
+
+	// Called when OnGaugeTimer receives a m_nextGaugeValue that results in a 100 percent
+	// completion in the gauge. It then takes into account the current value in m_gaugeResult
+	// to know what action should be taken as a result of the completion.
+	void OnGaugeFinished();
+
+	// wxSF event handlers.
 	void OnFrameButtons(wxSFShapeMouseEvent& event);
 	void OnSelectIso(wxSFShapeMouseEvent& event);
 	void OnVerifyIso(wxSFShapeMouseEvent& event);

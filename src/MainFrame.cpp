@@ -1,5 +1,7 @@
 #include "MainFrame.h"
 
+#include "wxmemdbg.h"
+
 MainFrame::MainFrame(wxWindow* parent,
 	wxWindowID id,
 	const wxString& title,
@@ -8,7 +10,7 @@ MainFrame::MainFrame(wxWindow* parent,
 	long style,
 	const wxString& name) : wxFrame(parent, id, title, pos, size, style, name)
 {
-	SetIcon(wxICON(aaaaBTFLValusLogoNoText));
+	SetIcon(wxICON(BTFLIconNoText));
 	SetBackgroundColour(wxColour(0, 0, 0));
 
 	m_patchNotesWindow = new LeftSidebar(this, -1, wxDefaultPosition, wxSize(400, -1), wxBORDER_NONE);
@@ -49,6 +51,13 @@ MainFrame::MainFrame(wxWindow* parent,
 	mainSizer->Add(m_copyrightPanel, wxSizerFlags(0).Expand());
 
 	SetSizer(mainSizer);
+	Bind(wxEVT_CLOSE_WINDOW, [&](wxCloseEvent& event)
+		{
+			m_mainPanelManager.SetShapeCanvas(nullptr);
+			m_seconPanelManager.SetShapeCanvas(nullptr);
+
+			event.Skip();
+		});
 }
 
 void MainFrame::LoadPatchNotes()

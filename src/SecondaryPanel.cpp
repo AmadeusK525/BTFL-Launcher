@@ -2,6 +2,8 @@
 #include "Scrollbar.h"
 #include "MainFrame.h"
 
+#include "wxmemdbg.h"
+
 DisclaimerPanel::DisclaimerPanel(SecondaryPanel* parent,
 	wxWindowID id,
 	const wxString& value,
@@ -43,6 +45,9 @@ EVT_SF_SHAPE_LEFT_DOWN(BUTTON_Minimize, SecondaryPanel::OnFrameButtons)
 EVT_SF_SHAPE_LEFT_DOWN(BUTTON_Close, SecondaryPanel::OnFrameButtons)
 EVT_SF_SHAPE_LEFT_DOWN(BUTTON_Back, SecondaryPanel::OnFrameButtons)
 
+EVT_SF_SHAPE_LEFT_DOWN(BUTTON_DisclaimerAgree, SecondaryPanel::OnAcceptDisclaimer)
+EVT_SF_SHAPE_LEFT_DOWN(BUTTON_DisclaimerAgreeVerify, SecondaryPanel::OnAcceptDisclaimer)
+
 wxEND_EVENT_TABLE()
 
 SecondaryPanel::SecondaryPanel(wxSFDiagramManager* manager, MainFrame* parent) :
@@ -76,6 +81,7 @@ SecondaryPanel::SecondaryPanel(wxSFDiagramManager* manager, MainFrame* parent) :
 
 	m_verSizer = new wxBoxSizer(wxVERTICAL);
 	SetSizer(m_verSizer);
+
 }
 
 void SecondaryPanel::ShowDisclaimer() 
@@ -105,27 +111,50 @@ void SecondaryPanel::ShowDisclaimer()
 		m_verSizer->Add(sizer, wxSizerFlags(1).Expand());
 	}
 
+	wxSFDiagramManager* manager = GetDiagramManager();
 	if ( !m_disDecline && !m_mainFrame->HasUserAgreedToDisclaimer() )
 	{
 		m_verSizer->AddSpacer(BOTTOM_SPACE);
-		wxSFDiagramManager* manager = GetDiagramManager();
 
 		m_disDecline = new TransparentButton("DECLINE", wxDefaultPosition, wxDefaultPosition, 3.0, manager);
-		m_disDecline->SetId(BUTTON_DisclaimerDecline);
+		m_disDecline->SetId(BUTTON_Back);
 		m_disDecline->SetFont(wxFontInfo(20).FaceName("Times New Roman"));
 		manager->AddShape(m_disDecline, nullptr, wxDefaultPosition, true, false);
 
-		m_disAgree = new TransparentButton("ACCEPT & VERIFY", wxDefaultPosition, wxDefaultPosition, 3.0, manager);
-		m_disAgree->SetId(BUTTON_DisclaimerAgree);
+		m_disAgree = new TransparentButton("", wxDefaultPosition, wxDefaultPosition, 3.0, manager);
 		m_disAgree->SetFill(wxBrush(wxColour(255, 255, 255)));
 		m_disAgree->SetTextColour(wxColour(0, 0, 0));
 		m_disAgree->SetFont(wxFontInfo(20).FaceName("Times New Roman"));
 		manager->AddShape(m_disAgree, nullptr, wxDefaultPosition, true, false);
 	}
+	else if ( m_disDecline && m_mainFrame->HasUserAgreedToDisclaimer() )
+	{
+		m_verSizer->Remove(2);
+
+		manager->RemoveShape(m_disDecline, false);
+		manager->RemoveShape(m_disAgree, true);
+		m_disDecline = nullptr;
+		m_disAgree = nullptr;
+	}
+
+	if ( m_disAgree )
+	{
+		if ( m_mainFrame->IsIsoSelected() )
+		{
+			m_disAgree->SetLabel("ACCEPT & VERIFY");
+			m_disAgree->SetId(BUTTON_DisclaimerAgreeVerify);
+		}
+		else
+		{
+			m_disAgree->SetLabel("ACCEPT");
+			m_disAgree->SetId(BUTTON_DisclaimerAgree);
+		}
+	}
 
 	Layout();
 	SendSizeEvent();
 	RepositionAll();
+	Refresh();
 }
 
 void SecondaryPanel::ShowSettings()
@@ -150,6 +179,7 @@ void SecondaryPanel::ShowSettings()
 	Layout();
 	SendSizeEvent();
 	RepositionAll();
+	Refresh();
 }
 
 void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
@@ -169,8 +199,22 @@ void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
 
 	case BUTTON_Back:
 		m_mainFrame->ShowMainPanel();
+		SetCursor(wxCURSOR_DEFAULT);
 		break;
 	}
+}
+
+void SecondaryPanel::OnAcceptDisclaimer(wxSFShapeMouseEvent& event)
+{
+	m_mainFrame->AcceptDisclaimer();
+	m_mainFrame->ShowMainPanel();
+
+	if ( event.GetId() == BUTTON_DisclaimerAgreeVerify )
+		m_mainFrame->VerifyIso();
+
+	// If the mouse isn't moved out of a button and the button is destroyed, the
+	// cursor doesn't set itself back to default, so I do it manually.
+	SetCursor(wxCURSOR_DEFAULT);
 }
 
 void SecondaryPanel::RepositionAll()

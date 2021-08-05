@@ -4,6 +4,8 @@
 #include "IsoChecking.h"
 #include <wx\filename.h>
 
+#include "wxmemdbg.h"
+
 wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()

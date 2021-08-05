@@ -8,6 +8,8 @@
 #include <wx\fs_inet.h>
 #include <wx\sstream.h>
 
+#include "wxmemdbg.h"
+
 ///////////////////////////////////////////////////////////////////////
 /////////////////////////// HyperlinkPanel ////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -187,8 +189,11 @@ bool LeftSidebar::Load()
 			m_rtc->Update();
 			m_scrollbar->RecalculateSelf();
 
+			delete file;
 			return true;
 		}
+
+		delete file;
 	}
 
 	return false;

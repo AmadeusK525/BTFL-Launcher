@@ -3,6 +3,8 @@
 #include <wx\dcbuffer.h>
 #include <wx\dcgraph.h>
 
+#include "wxmemdbg.h"
+
 wxBEGIN_EVENT_TABLE(CustomRTCScrollbar, wxPanel)
 
 EVT_SIZE(CustomRTCScrollbar::OnSize)
@@ -28,9 +30,9 @@ CustomRTCScrollbar::CustomRTCScrollbar(wxWindow* parent, wxRichTextCtrl* target,
 	m_orientation = orientation;
 
 	if ( size != wxDefaultSize )
-		m_minWidth = size.y;
+		m_nMinWidth = size.y;
 
-	SetMinSize(wxSize(m_minWidth, -1));
+	SetMinSize(wxSize(m_nMinWidth, -1));
 
 	SetBackgroundStyle(wxBG_STYLE_PAINT);
 	Bind(wxEVT_ERASE_BACKGROUND, [](wxEraseEvent&) {});
@@ -77,12 +79,24 @@ void CustomRTCScrollbar::RecalculateSelf()
 
 	if ( m_orientation == wxVERTICAL )
 	{
-		m_ratio = (double)size.y / rtcVirtualSize.y;
+		m_dRatio = (double)size.y / rtcVirtualSize.y;
 
 		int yo;
 		m_rtc->CalcUnscrolledPosition(0, 0, nullptr, &yo);
-		m_currentPos = yo * m_ratio;
-		m_currentThumbRect = wxRect(0, m_currentPos, size.x, (int)(rtcSize.y * m_ratio));
+		m_nCurrentPos = yo * m_dRatio;
+
+		int nThumbHeight = int(rtcSize.y * m_dRatio);
+		if ( nThumbHeight < 20 )
+		{
+			m_dPrivateScale = 20.0 / nThumbHeight;
+			nThumbHeight = 20;
+		}
+		else
+		{
+			m_dPrivateScale = 1.0;
+		}
+
+		m_currentThumbRect = wxRect(0, m_nCurrentPos / m_dPrivateScale, size.x, nThumbHeight);
 	}
 
 	Refresh();
@@ -93,16 +107,17 @@ void CustomRTCScrollbar::DoScroll(int pos)
 {
 	int max = GetSize().y - m_currentThumbRect.GetHeight();
 	if ( pos < 0 )
-		m_currentPos = 0;
+		m_nCurrentPos = 0;
 	else if ( pos > max )
-		m_currentPos = max;
+		m_nCurrentPos = max;
 	else
-		m_currentPos = pos;
+		m_nCurrentPos = pos;
 
-	m_currentThumbRect.SetY(m_currentPos);
+	m_currentThumbRect.SetY(m_nCurrentPos);
 	m_rtc->Freeze();
-	m_rtc->Scroll(0, ((double)m_currentPos / m_ratio) / m_rtc->GetLineHeight());
+	m_rtc->Scroll(0, ((double)m_nCurrentPos / m_dRatio) / m_rtc->GetLineHeight());
 	m_rtc->Thaw();
+	m_rtc->Update();
 
 	Refresh();
 	Update();
@@ -111,6 +126,7 @@ void CustomRTCScrollbar::DoScroll(int pos)
 void CustomRTCScrollbar::OnTargetScroll(wxScrollWinEvent& event)
 {
 	RecalculateSelf();
+	m_rtc->Update();
 	event.Skip();
 }
 
@@ -150,16 +166,16 @@ void CustomRTCScrollbar::OnPaint(wxPaintEvent& event)
 	gdc.SetBrush(wxBrush(GetBackgroundColour()));
 	gdc.DrawRectangle(wxPoint(0, 0), size);
 
-	if ( m_barWidth > 0 )
+	if ( m_nBarWidth > 0 )
 	{
-		gdc.SetPen(wxPen(wxColour(255, 255, 255, 50), m_barWidth));
+		gdc.SetPen(wxPen(wxColour(255, 255, 255, 50), m_nBarWidth));
 		int x = size.x / 2;
 		gdc.DrawLine(wxPoint(x, 0), wxPoint(x, size.y));
 	}
 
 	gdc.SetPen(*wxTRANSPARENT_PEN);
 	gdc.SetBrush(wxBrush(GetForegroundColour()));
-	gdc.DrawRoundedRectangle(m_currentThumbRect, m_borderRadius);
+	gdc.DrawRoundedRectangle(m_currentThumbRect, m_dBorderRadius);
 }
 
 void CustomRTCScrollbar::OnLeftDown(wxMouseEvent& event)
@@ -167,22 +183,22 @@ void CustomRTCScrollbar::OnLeftDown(wxMouseEvent& event)
 	wxPoint pos = event.GetPosition();
 	if ( m_currentThumbRect.Contains(pos) )
 	{
-		m_isDragging = true;
+		m_bIsDragging = true;
 		CaptureMouse();
-		m_dragOffset = pos.y - m_currentPos;
+		m_nDragOffset = pos.y - m_nCurrentPos;
 	} else
 	{
-		int toScroll = m_currentPos;
+		int toScroll = m_nCurrentPos;
 
 		if ( m_orientation == wxVERTICAL )
 		{
-			if ( pos.y > m_currentPos )
+			if ( pos.y > m_nCurrentPos )
 				toScroll += m_currentThumbRect.GetHeight() - 20;
 			else
 				toScroll -= m_currentThumbRect.GetHeight() + 20;
 		} else
 		{
-			if ( pos.x > m_currentPos )
+			if ( pos.x > m_nCurrentPos )
 				toScroll += m_currentThumbRect.GetWidth() - 20;
 			else
 				toScroll -= m_currentThumbRect.GetWidth() + 20;
@@ -198,7 +214,7 @@ void CustomRTCScrollbar::OnLeftUp(wxMouseEvent& event)
 	if ( HasCapture() )
 		ReleaseMouse();
 
-	m_isDragging = false;
+	m_bIsDragging = false;
 	m_setOffOnHold.Stop();
 	m_scrollOnHold.Stop();
 	RecalculateSelf();
@@ -206,12 +222,12 @@ void CustomRTCScrollbar::OnLeftUp(wxMouseEvent& event)
 
 void CustomRTCScrollbar::OnMouseMove(wxMouseEvent& event)
 {
-	if ( m_isDragging )
+	if ( m_bIsDragging )
 	{
 		if ( m_orientation == wxVERTICAL )
-			DoScroll(event.GetY() - m_dragOffset);
+			DoScroll(event.GetY() - m_nDragOffset);
 		else
-			DoScroll(event.GetX() - m_dragOffset);
+			DoScroll(event.GetX() - m_nDragOffset);
 	}
 }
 
@@ -223,7 +239,7 @@ void CustomRTCScrollbar::OnLeaveWindow(wxMouseEvent& event)
 
 void CustomRTCScrollbar::OnMouseCaptureLost(wxMouseCaptureLostEvent& event)
 {
-	m_isDragging = false;
+	m_bIsDragging = false;
 	m_scrollOnHold.Stop();
 	RecalculateSelf();
 }

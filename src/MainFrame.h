@@ -19,7 +19,7 @@ private:
 	LeftSidebar* m_patchNotesWindow = nullptr;
 	wxPanel* m_copyrightPanel = nullptr;
 
-	bool m_hasUserAgreed = false;
+	bool m_hasUserAgreedToDisclaimer = false;
 
 public:
 	MainFrame(wxWindow* parent,
@@ -37,8 +37,13 @@ public:
 	void ShowDisclaimer();
 	void ShowSettings();
 
-	bool HasUserAgreedToDisclaimer() { return m_hasUserAgreed; }
+	void VerifyIso() { m_mainPanel->VerifyIso(); }
+
+	void AcceptDisclaimer() { m_hasUserAgreedToDisclaimer = true; }
 	void OnReadDisclaimer(wxMouseEvent& event);
+
+	bool IsIsoSelected() { return m_mainPanel->GetISOFile().FileExists(); }
+	bool HasUserAgreedToDisclaimer() { return m_hasUserAgreedToDisclaimer; }
 
 	inline const wxBitmap& GetBackgroundBitmap() { return m_mainPanel->GetBackgroundBitmap(); }
 };

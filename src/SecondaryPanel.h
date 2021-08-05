@@ -37,8 +37,8 @@ enum
 {
 	BUTTON_Back,
 
-	BUTTON_DisclaimerDecline,
-	BUTTON_DisclaimerAgree
+	BUTTON_DisclaimerAgree,
+	BUTTON_DisclaimerAgreeVerify
 };
 
 class SecondaryPanel : public BackgroundImageCanvas
@@ -68,6 +68,7 @@ public:
 	void ShowSettings();
 
 	void OnFrameButtons(wxSFShapeMouseEvent& event);
+	void OnAcceptDisclaimer(wxSFShapeMouseEvent& event);
 
 	void RepositionAll();
 	virtual void DrawForeground(wxDC& dc, bool fromPaint) override;

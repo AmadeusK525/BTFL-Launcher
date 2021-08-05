@@ -30,6 +30,7 @@
     <ClInclude Include="src\Scrollbar.h" />
     <ClInclude Include="src\SecondaryPanel.h" />
     <ClInclude Include="src\TransparentButton.h" />
+    <ClInclude Include="src\wxmemdbg.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BaseClasses.cpp" />
