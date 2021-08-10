@@ -7,3 +7,6 @@ Beyond the Forbidden Lands is a non-profit fan-made PC remake of Shadow of the C
 ## The Launcher
 
 The game will be run through this launcher, which will mainly check for the validity of an iso of the original game and automatically search for updates. Without an original iso, the user will not be able to launch the game's executable.
+
+
+NOTE: As of August 9th, 2021 all further development has been moved to the BTFLDev Fork.
