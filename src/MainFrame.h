@@ -8,6 +8,11 @@
 #include "SecondaryPanel.h"
 #include "PatchNotes.h"
 
+enum
+{
+	TIMER_LoadPatchNotes
+};
+
 class MainFrame : public wxFrame
 {
 private:
@@ -18,6 +23,10 @@ private:
 
 	LeftSidebar* m_patchNotesWindow = nullptr;
 	wxPanel* m_copyrightPanel = nullptr;
+
+	wxTimer m_loadPatchNotesTimer;
+	unsigned int m_nLoadPatchNotesAttempts = 0;
+	unsigned int m_nLoadPatchNotesCountdown = 0;
 
 	bool m_hasUserAgreedToDisclaimer = false;
 
@@ -31,6 +40,7 @@ public:
 		const wxString& name = wxFrameNameStr);
 
 	void LoadPatchNotes();
+	void OnLoadPatchNotesTimer(wxTimerEvent& event);
 
 	void ShowMainPanel();
 	void ShowSecondaryPanel();
@@ -46,6 +56,8 @@ public:
 	bool HasUserAgreedToDisclaimer() { return m_hasUserAgreedToDisclaimer; }
 
 	inline const wxBitmap& GetBackgroundBitmap() { return m_mainPanel->GetBackgroundBitmap(); }
+
+	wxDECLARE_EVENT_TABLE();
 };
 
 #endif

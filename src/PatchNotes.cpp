@@ -170,6 +170,8 @@ LeftSidebar::LeftSidebar(wxWindow* parent,
 
 bool LeftSidebar::Load()
 {
+	SetMessage("\nFetching latest content...");
+
 	wxFileSystem fs;
 	wxFSFile* file = fs.OpenFile("http://btflgame.com/patch_notes/all.xml");
 
@@ -202,6 +204,7 @@ bool LeftSidebar::Load()
 void LeftSidebar::SetMessage(const wxString& message)
 {
 	m_rtc->SetValue(message);
+	Refresh();
 }
 
 void LeftSidebar::OnPaint(wxPaintEvent& event)
