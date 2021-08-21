@@ -305,27 +305,7 @@ void MainPanel::OnGaugeFinished()
 	RepositionAll();
 }
 
-void MainPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
-{
-	switch ( event.GetId() )
-	{
-	case BUTTON_Help:
-		break;
-
-	case BUTTON_Minimize:
-		m_mainFrame->Iconize();
-		break;
-
-	case BUTTON_Close:
-		m_mainFrame->Close();
-		break;
-
-	default:
-		break;
-	}
-}
-
-void MainPanel::OnSelectIso(wxSFShapeMouseEvent& event)
+void MainPanel::DoSelectIso()
 {
 	wxFileDialog fileDialog(nullptr, _("Please select an original Shadow Of The Colossus ISO file..."),
 		"", "", "ISO files (*.iso)|*.iso", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
@@ -361,7 +341,32 @@ void MainPanel::OnSelectIso(wxSFShapeMouseEvent& event)
 	m_mainButton->SetId(BUTTON_VerifyIso);
 
 	RepositionAll();
-	Thaw();
+	Refresh();
+}
+
+void MainPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
+{
+	switch ( event.GetId() )
+	{
+	case BUTTON_Help:
+		break;
+
+	case BUTTON_Minimize:
+		m_mainFrame->Iconize();
+		break;
+
+	case BUTTON_Close:
+		m_mainFrame->Close();
+		break;
+
+	default:
+		break;
+	}
+}
+
+void MainPanel::OnSelectIso(wxSFShapeMouseEvent& event)
+{
+	DoSelectIso();
 }
 
 void MainPanel::OnVerifyIso(wxSFShapeMouseEvent& event)
@@ -414,10 +419,40 @@ void MainPanel::OnMouseMove(wxMouseEvent& event)
 {
 	BackgroundImageCanvas::OnMouseMove(event);
 
-	bool isHoveringFileDesc = m_fileDescRect.Contains(event.GetPosition());
-	if ( isHoveringFileDesc != m_isHoveringFileDesc )
+	bool bIsHoveringFileDesc = m_fileDescRect.Contains(event.GetPosition());
+	if ( bIsHoveringFileDesc != m_isHoveringFileDesc )
 	{
-		SetCursor((wxStockCursor)((wxCURSOR_DEFAULT * !isHoveringFileDesc) + (wxCURSOR_CLOSED_HAND * isHoveringFileDesc)));
-		m_isHoveringFileDesc = isHoveringFileDesc;
+		SetCursor((wxStockCursor)((wxCURSOR_DEFAULT * !bIsHoveringFileDesc) + (wxCURSOR_CLOSED_HAND * bIsHoveringFileDesc)));
+		m_isHoveringFileDesc = bIsHoveringFileDesc;
+	}
+	else
+	{
+		if ( !bIsHoveringFileDesc && !m_gauge )
+		{
+			bool bIsHoveringFileCont = m_mainButton->GetId() == BUTTON_VerifyIso
+				&& wxRect(
+					wxPoint(m_xFBmp, m_yFBmp) * m_fileBmpScale,
+					m_fileBmp.GetSize() * m_fileBmpScale
+				).Contains(event.GetPosition());
+
+			if ( bIsHoveringFileCont != m_isHoveringFileCont )
+			{
+				SetCursor((wxStockCursor)((wxCURSOR_DEFAULT * !bIsHoveringFileCont) + (wxCURSOR_CLOSED_HAND * bIsHoveringFileCont)));
+				m_isHoveringFileCont = bIsHoveringFileCont;
+			}
+		}
+	}
+}
+
+void MainPanel::OnLeftDown(wxMouseEvent& event) {
+	BackgroundImageCanvas::OnLeftDown(event);
+
+	if ( m_isHoveringFileCont )
+	{
+		DoSelectIso();
+	}
+	else if ( m_isHoveringFileDesc )
+	{
+		// TODO: Open "Installation guide"
 	}
 }

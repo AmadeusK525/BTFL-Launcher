@@ -80,6 +80,7 @@ private:
 		m_fileDescFont{ wxFontInfo(10).FaceName("Times New Roman") };
 	wxRect m_fileDescRect;
 	bool m_isHoveringFileDesc = false;
+	bool m_isHoveringFileCont = false;
 	wxColour m_fileDescColour{ 52, 199, 226 };
 	wxBitmap m_fileContainer, m_fileBmp;
 
@@ -134,6 +135,8 @@ public:
 	// to know what action should be taken as a result of the completion.
 	void OnGaugeFinished();
 
+	void DoSelectIso();
+
 	// wxSF event handlers.
 	void OnFrameButtons(wxSFShapeMouseEvent& event);
 	void OnSelectIso(wxSFShapeMouseEvent& event);
@@ -142,6 +145,7 @@ public:
 
 	virtual void OnSize(wxSizeEvent& event) override;
 	virtual void OnMouseMove(wxMouseEvent& event) override;
+	virtual void OnLeftDown(wxMouseEvent& event) override;
 
 	virtual void DrawForeground(wxDC& dc, bool fromPaint) override;
 
