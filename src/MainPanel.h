@@ -79,7 +79,7 @@ private:
 	wxFont m_fileLabelFont{ wxFontInfo(12).FaceName("Times New Roman") },
 		m_fileDescFont{ wxFontInfo(10).FaceName("Times New Roman") };
 	wxRect m_fileDescRect;
-	bool m_isHoveringFileDesc = false;
+	bool m_isHoveringViewGuide = false;
 	bool m_isHoveringFileCont = false;
 	wxColour m_fileDescColour{ 52, 199, 226 };
 	wxBitmap m_fileContainer, m_fileBmp;

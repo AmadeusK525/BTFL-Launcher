@@ -15,7 +15,7 @@ MainFrame::MainFrame(wxWindow* parent,
 	long style,
 	const wxString& name) : wxFrame(parent, id, title, pos, size, style, name), m_loadPatchNotesTimer(this, TIMER_LoadPatchNotes)
 {
-	SetIcon(wxICON(BTFLIconNoText));
+	SetIcon(wxICON(aaaaBTFLIconNoText));
 	SetBackgroundColour(wxColour(0, 0, 0));
 
 	m_patchNotesWindow = new LeftSidebar(this, -1, wxDefaultPosition, wxSize(400, -1), wxBORDER_NONE);

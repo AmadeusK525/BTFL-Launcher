@@ -419,15 +419,15 @@ void MainPanel::OnMouseMove(wxMouseEvent& event)
 {
 	BackgroundImageCanvas::OnMouseMove(event);
 
-	bool bIsHoveringFileDesc = m_fileDescRect.Contains(event.GetPosition());
-	if ( bIsHoveringFileDesc != m_isHoveringFileDesc )
+	bool bIsHoveringViewGuide = m_mainButton->GetId() == BUTTON_SelectIso && m_fileDescRect.Contains(event.GetPosition());
+	if ( bIsHoveringViewGuide != m_isHoveringViewGuide )
 	{
-		SetCursor((wxStockCursor)((wxCURSOR_DEFAULT * !bIsHoveringFileDesc) + (wxCURSOR_CLOSED_HAND * bIsHoveringFileDesc)));
-		m_isHoveringFileDesc = bIsHoveringFileDesc;
+		SetCursor((wxStockCursor)((wxCURSOR_DEFAULT * !bIsHoveringViewGuide) + (wxCURSOR_CLOSED_HAND * bIsHoveringViewGuide)));
+		m_isHoveringViewGuide = bIsHoveringViewGuide;
 	}
 	else
 	{
-		if ( !bIsHoveringFileDesc && !m_gauge )
+		if ( !bIsHoveringViewGuide && !m_gauge )
 		{
 			bool bIsHoveringFileCont = m_mainButton->GetId() == BUTTON_VerifyIso
 				&& wxRect(
@@ -451,7 +451,7 @@ void MainPanel::OnLeftDown(wxMouseEvent& event) {
 	{
 		DoSelectIso();
 	}
-	else if ( m_isHoveringFileDesc )
+	else if ( m_isHoveringViewGuide )
 	{
 		// TODO: Open "Installation guide"
 	}
