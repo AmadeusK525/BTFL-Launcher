@@ -144,19 +144,19 @@ LeftSidebar::LeftSidebar(wxWindow* parent,
 
 	HyperlinkPanel* website = new HyperlinkPanel(this, "http://btflgame.com", wxBitmap("Assets\\Icon\\Website@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
 	website->SetBackgroundColour(wxColour(0, 0, 0));
-	HyperlinkPanel* discord = new HyperlinkPanel(this, "https://discord.gg/8QHmrxJBwW", wxBitmap("Assets\\Icon\\Discord@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
+	HyperlinkPanel* discord = new HyperlinkPanel(this, "https://discord.gg/PcjByKk", wxBitmap("Assets\\Icon\\Discord@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
 	discord->SetBackgroundColour(wxColour(0, 0, 0));
-	HyperlinkPanel* facebook = new HyperlinkPanel(this, "http://facebook.com", wxBitmap("Assets\\Icon\\Facebook@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
-	facebook->SetBackgroundColour(wxColour(0, 0, 0));
+	HyperlinkPanel* reddit = new HyperlinkPanel(this, "https://reddit.com/r/BTFLgame", wxBitmap("Assets\\Icon\\Reddit@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
+	reddit->SetBackgroundColour(wxColour(0, 0, 0));
 	HyperlinkPanel* twitter = new HyperlinkPanel(this, "http://twitter.com/btfl_game", wxBitmap("Assets\\Icon\\Twitter@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
 	twitter->SetBackgroundColour(wxColour(0, 0, 0));
-	HyperlinkPanel* youtube = new HyperlinkPanel(this, "https://www.youtube.com/channel/UCVLLghUk9B_rLddv7qNMS6w", wxBitmap("Assets\\Icon\\YouTube@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
+	HyperlinkPanel* youtube = new HyperlinkPanel(this, "https://www.youtube.com/channel/UC4Z1YwJ0fAMt5MU0y2melOA/", wxBitmap("Assets\\Icon\\YouTube@2x.png", wxBITMAP_TYPE_PNG), wxSize(26, 26));
 	youtube->SetBackgroundColour(wxColour(0, 0, 0));
 
 	wxBoxSizer* socialSizer = new wxBoxSizer(wxHORIZONTAL);
 	socialSizer->Add(website, wxSizerFlags(0).Border(wxALL, 10));
 	socialSizer->Add(discord, wxSizerFlags(0).Border(wxALL, 10));
-	socialSizer->Add(facebook, wxSizerFlags(0).Border(wxALL, 10));
+	socialSizer->Add(reddit, wxSizerFlags(0).Border(wxALL, 10));
 	socialSizer->Add(twitter, wxSizerFlags(0).Border(wxALL, 10));
 	socialSizer->Add(youtube, wxSizerFlags(0).Border(wxALL, 10));
 
