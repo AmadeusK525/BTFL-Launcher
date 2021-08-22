@@ -13,11 +13,6 @@ bool MyApp::OnInit()
 	wxInitAllImageHandlers();
 	wxBitmap shape("Assets\\FrameShape.png", wxBITMAP_TYPE_PNG);
 
-	// ***For Visual Studio Project only***
-	wxFileName exec = argv[0];
-	exec.RemoveLastDir();
-	wxSetWorkingDirectory(exec.GetPath());
-
 	m_mainFrame = new MainFrame(nullptr, -1, "Beyond The Forbidden Lands - Launcher",
 		wxDefaultPosition, shape.GetSize(), wxFRAME_SHAPED | wxBORDER_NONE);
 	m_mainFrame->Show();
