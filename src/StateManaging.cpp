@@ -2,6 +2,8 @@
 #include "MainFrame.h"
 #include "IsoHashes.h"
 
+#include <thread>
+
 btfl::SQLDatabase::SQLDatabase(wxFileName& path)
 {
 	EnableForeignKeySupport(true);
@@ -182,23 +184,17 @@ wxSQLite3Statement btfl::SQLDatabase::ConstructUpdateStatement(const btfl::SQLEn
 	{
 		if ( !first )
 			update << ", ";
+		else
+			first = false;
 
 		update << it.first << " = '" << buffer.Format("%q", (const char*)it.second) << "'";
-		first = false;
 	}
 
 	update << " WHERE rowid = " << id << ";";
 
 	try
 	{
-		wxSQLite3Statement statement = PrepareStatement(update);
-
-		int i = 1;
-
-		for ( std::pair<const wxString, wxMemoryBuffer>& it : sqlEntry.memBuffers )
-			statement.Bind(i++, it.second);
-
-		return statement;
+		return PrepareStatement(update);
 	}
 	catch ( wxSQLite3Exception& e )
 	{
@@ -215,6 +211,7 @@ wxSQLite3Statement btfl::SQLDatabase::ConstructUpdateStatement(const btfl::SQLEn
 
 
 btfl::SQLDatabase* pDatabase;
+btfl::LauncherState currentState = btfl::LauncherState::STATE_Initial;
 
 MainFrame* pMainFrame;
 
@@ -230,8 +227,6 @@ void btfl::Init()
 	pMainFrame->Layout();
 	pMainFrame->Update();
 
-	pMainFrame->LoadPatchNotes();
-
 	wxSQLite3Database::InitializeSQLite();
 	pDatabase = new btfl::SQLDatabase();
 	pDatabase->Open("./LauncherData.db", db_encryption_key);
@@ -239,7 +234,7 @@ void btfl::Init()
 	if ( !pDatabase->Init() )
 	{
 		btfl::SQLEntry userEntry("user_data");
-		userEntry.integers["user_state"] = btfl::LauncherState::STATE_ToSelectIso;
+		userEntry.integers["user_state"] = currentState;
 		userEntry.integers["has_agreed_to_disclaimer"] = false;
 		userEntry.strings["iso_file_path"] = "";
 
@@ -250,6 +245,12 @@ void btfl::Init()
 
 		pDatabase->InsertSQLEntry(userEntry);
 		pDatabase->InsertSQLEntry(launcherEntry);
+
+		btfl::SetState(btfl::LauncherState::STATE_ToSelectIso);
+	}
+	else
+	{
+		btfl::LoadLauncher(pDatabase);
 	}
 
 	pMainFrame->Show();
@@ -261,4 +262,39 @@ void btfl::ShutDown()
 	wxSQLite3Database::ShutdownSQLite();
 	delete pDatabase;
 	pDatabase = nullptr;
+}
+
+void btfl::SetState(btfl::LauncherState state)
+{
+	if ( state == currentState )
+		return;
+
+	pMainFrame->SetState(state);
+	currentState = state;
+
+	btfl::SQLEntry sqlEntry("user_data");
+	sqlEntry.integers["user_state"] = currentState;
+	
+	UpdateDatabase(sqlEntry);
+}
+
+void btfl::LoadLauncher(btfl::SQLDatabase* database)
+{
+	wxSQLite3ResultSet result = database->ExecuteQuery("SELECT * FROM user_data WHERE rowid = 1;");
+	if ( result.NextRow() )
+	{
+		SetState((btfl::LauncherState)result.GetInt("user_state"));
+	}
+}
+
+void btfl::UpdateDatabase(const btfl::SQLEntry& sqlEntry)
+{
+	std::thread thread([sqlEntry]()
+		{
+			pDatabase->Begin();
+			pDatabase->UpdateSQLEntry(sqlEntry);
+			pDatabase->Commit();
+		}
+	);
+	thread.detach();
 }

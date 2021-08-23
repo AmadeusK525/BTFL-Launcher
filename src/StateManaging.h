@@ -41,12 +41,22 @@ namespace btfl
 
 		STATE_ToSelectIso,
 		STATE_ToVerifyIso,
+		STATE_VerifyingIso,
 		STATE_ToInstallGame,
-		STATE_ToPlayGame
+		STATE_InstallingGame,
+		STATE_ToPlayGame,
+		STATE_LaunchingGame,
+		STATE_ToUpdateGame,
+		STATE_UpdatingGame
 	};
 
 	void Init();
 	void ShutDown();
+	void LoadLauncher(btfl::SQLDatabase* database);
+
+	void SetState(LauncherState state);
+
+	void UpdateDatabase(const btfl::SQLEntry& sqlEntry);
 }
 
 #endif

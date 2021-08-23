@@ -7,6 +7,7 @@
 #include "MainPanel.h"
 #include "SecondaryPanel.h"
 #include "PatchNotes.h"
+#include "StateManaging.h"
 
 enum
 {
@@ -41,6 +42,8 @@ public:
 
 	void LoadPatchNotes();
 	void OnLoadPatchNotesTimer(wxTimerEvent& event);
+
+	void SetState(btfl::LauncherState state);
 
 	void ShowMainPanel();
 	void ShowSecondaryPanel();

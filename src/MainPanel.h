@@ -12,6 +12,7 @@
 #include "PatchNotes.h"
 #include "FrameButtons.h"
 #include "TransparentButton.h"
+#include "StateManaging.h"
 
 class MainFrame;
 class CustomGauge;
@@ -50,12 +51,6 @@ public:
 enum
 {
 	BUTTON_Settings,
-
-	BUTTON_SelectIso,
-	BUTTON_VerifyIso,
-	BUTTON_Install,
-	BUTTON_Play,
-
 	TIMER_Gauge
 };
 
@@ -112,7 +107,7 @@ public:
 		const wxSize& size = wxDefaultSize,
 		long style = wxBORDER_NONE);
 
-	inline const wxBitmap& GetBackgroundBitmap() { return m_background; }
+	void SetState(btfl::LauncherState state);
 
 	// Put everything in place, be it buttons, labels, bitmaps, etc.
 	void RepositionAll();
