@@ -1,6 +1,7 @@
 #include "StateManaging.h"
 #include "MainFrame.h"
 #include "IsoHashes.h"
+#include "IsoChecking.h"
 
 #include <thread>
 
@@ -30,6 +31,7 @@ void btfl::SQLDatabase::CreateAllTables()
 	tUserData.Add("user_state INTEGER");
 	tUserData.Add("has_agreed_to_disclaimer INTEGER");
 	tUserData.Add("iso_file_path TEXT");
+	tUserData.Add("iso_region INTEGER");
 
 	wxArrayString tLauncherData;
 	tLauncherData.Add("install_path TEXT");
@@ -212,6 +214,12 @@ wxSQLite3Statement btfl::SQLDatabase::ConstructUpdateStatement(const btfl::SQLEn
 
 btfl::SQLDatabase* pDatabase;
 btfl::LauncherState currentState = btfl::LauncherState::STATE_Initial;
+wxFileName isoFileName;
+bool bHasUserAgreedToDisclaimer = false;
+iso::ISO_Region isoRegion = iso::ISO_Region::ISO_Invalid;
+
+wxFileName installFileName("./Game");
+wxString sInstalledVersion;
 
 MainFrame* pMainFrame;
 
@@ -236,6 +244,7 @@ void btfl::Init()
 		btfl::SQLEntry userEntry("user_data");
 		userEntry.integers["user_state"] = currentState;
 		userEntry.integers["has_agreed_to_disclaimer"] = false;
+		userEntry.integers["iso_region"] = iso::ISO_Region::ISO_Invalid;
 		userEntry.strings["iso_file_path"] = "";
 
 		btfl::SQLEntry launcherEntry("launcher_data");
@@ -283,7 +292,18 @@ void btfl::LoadLauncher(btfl::SQLDatabase* database)
 	wxSQLite3ResultSet result = database->ExecuteQuery("SELECT * FROM user_data WHERE rowid = 1;");
 	if ( result.NextRow() )
 	{
+		isoFileName.Assign(result.GetAsString("iso_file_path"));
+		isoRegion = (iso::ISO_Region)result.GetInt("iso_region");
+		bHasUserAgreedToDisclaimer = result.GetInt("has_agreed_to_disclaimer");
+
 		SetState((btfl::LauncherState)result.GetInt("user_state"));
+	}
+
+	result = database->ExecuteQuery("SELECT * FROM launcher_data WHERE rowid = 1;");
+	if ( result.NextRow() )
+	{
+		installFileName.Assign(result.GetAsString("install_path"));
+		sInstalledVersion = result.GetAsString("installed_version");
 	}
 }
 
@@ -297,4 +317,32 @@ void btfl::UpdateDatabase(const btfl::SQLEntry& sqlEntry)
 		}
 	);
 	thread.detach();
+}
+
+const wxFileName& btfl::GetIsoFileName() 
+{
+	return isoFileName;
+}
+
+void btfl::SetIsoFileName(const wxFileName& fileName)
+{
+	isoFileName = fileName;
+
+	btfl::SQLEntry sqlEntry("user_data");
+	sqlEntry.strings["iso_file_path"] = fileName.GetFullPath();
+	btfl::UpdateDatabase(sqlEntry);
+}
+
+bool btfl::HasUserAgreedToDisclaimer()
+{
+	return bHasUserAgreedToDisclaimer;
+}
+
+void btfl::AgreeToDisclaimer()
+{
+	bHasUserAgreedToDisclaimer = true;
+	
+	btfl::SQLEntry sqlEntry("user_data");
+	sqlEntry.integers["has_agreed_to_disclaimer"] = true;
+	btfl::UpdateDatabase(sqlEntry);
 }

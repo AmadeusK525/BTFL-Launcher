@@ -115,7 +115,7 @@ void MainPanel::SetState(btfl::LauncherState state)
 		m_mainButton->Enable(true);
 
 		m_fileBmp.LoadFile("Assets\\Icon\\Folder@2x.png", wxBITMAP_TYPE_PNG);
-		m_fileLabel = m_iso.GetName();
+		m_fileLabel = btfl::GetIsoFileName().GetName();
 		m_fileDesc = "ISO File";
 		break;
 
@@ -125,7 +125,7 @@ void MainPanel::SetState(btfl::LauncherState state)
 		m_mainButton->Enable(false);
 
 		m_fileBmp.LoadFile("Assets\\Icon\\Folder@2x.png", wxBITMAP_TYPE_PNG);
-		m_fileLabel = m_iso.GetName();
+		m_fileLabel = btfl::GetIsoFileName().GetName();
 		m_fileDesc = "ISO File";
 		break;
 
@@ -218,7 +218,7 @@ void MainPanel::RepositionAll()
 
 void MainPanel::VerifyIso()
 {
-	if ( !m_iso.Exists() )
+	if ( !btfl::GetIsoFileName().Exists() )
 		return;
 
 	// Create the gauge and make the main button, which right now is for
@@ -237,7 +237,7 @@ void MainPanel::VerifyIso()
 			m_nextGaugeLabel = "Verifying ISO validity...";
 			srand(time(0));
 
-			wxString fileHash = iso::GetFileHash(m_iso.GetFullPath(), m_nextGaugeValue);
+			wxString fileHash = iso::GetFileHash(btfl::GetIsoFileName().GetFullPath(), m_nextGaugeValue);
 			
 			m_nextGaugeLabel = "Processing results...";
 			iso::ISO_Region region = iso::GetIsoRegion(fileHash);
@@ -368,10 +368,10 @@ void MainPanel::DoSelectIso()
 		return;
 	}
 
-	m_iso = fileName;
+	btfl::SetIsoFileName(fileName);
 
 	// Show disclaimer before doing everything else if the user hasn't agreed to it yet.
-	if ( !m_mainFrame->HasUserAgreedToDisclaimer() )
+	if ( !btfl::HasUserAgreedToDisclaimer() )
 		m_mainFrame->ShowDisclaimer();
 
 	// Update GUI components to make the iso file selection clear to the user.
@@ -409,7 +409,7 @@ void MainPanel::OnVerifyIso(wxSFShapeMouseEvent& event)
 {
 	// If the user still hasn't agreed to the disclaimer, make them agree to it again.
 	// VerifyIso() will only be called once they do.
-	if ( !m_mainFrame->HasUserAgreedToDisclaimer() )
+	if ( !btfl::HasUserAgreedToDisclaimer() )
 	{
 		m_mainFrame->ShowDisclaimer();
 		return;

@@ -151,7 +151,7 @@ void SecondaryPanel::ShowDisclaimer()
 	}
 
 	wxSFDiagramManager* manager = GetDiagramManager();
-	if ( !m_disDecline && !m_mainFrame->HasUserAgreedToDisclaimer() )
+	if ( !m_disDecline && !btfl::HasUserAgreedToDisclaimer() )
 	{
 		m_verSizer->AddSpacer(BOTTOM_SPACE);
 
@@ -166,7 +166,7 @@ void SecondaryPanel::ShowDisclaimer()
 		m_disAgree->SetFont(wxFontInfo(20).FaceName("Times New Roman"));
 		manager->AddShape(m_disAgree, nullptr, wxDefaultPosition, true, false);
 	}
-	else if ( m_disDecline && m_mainFrame->HasUserAgreedToDisclaimer() )
+	else if ( m_disDecline && btfl::HasUserAgreedToDisclaimer() )
 	{
 		m_verSizer->Remove(2);
 
@@ -303,7 +303,7 @@ void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
 
 void SecondaryPanel::OnAcceptDisclaimer(wxSFShapeMouseEvent& event)
 {
-	m_mainFrame->AcceptDisclaimer();
+	btfl::AgreeToDisclaimer();
 	m_mainFrame->ShowMainPanel();
 
 	if ( event.GetId() == BUTTON_DisclaimerAgreeVerify )

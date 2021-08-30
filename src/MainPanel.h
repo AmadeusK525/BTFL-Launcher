@@ -70,8 +70,6 @@ private:
 	wxBitmap m_logo;
 	int m_logox = 0, m_logoy = 0;
 
-	wxFileName m_iso;
-
 	wxString m_fileLabel{ "No ISO selected..." }, m_fileDesc{ "View Installation Guide" };
 	wxFont m_fileLabelFont{ wxFontInfo(12).FaceName("Times New Roman") },
 		m_fileDescFont{ wxFontInfo(10).FaceName("Times New Roman") };
@@ -111,8 +109,6 @@ public:
 
 	// Put everything in place, be it buttons, labels, bitmaps, etc.
 	void RepositionAll();
-
-	inline wxFileName GetISOFile() { return m_iso; }
 
 	// Start the iso verification process. Only works if m_iso is valid.
 	void VerifyIso();

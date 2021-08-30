@@ -55,7 +55,7 @@ public:
 	void AcceptDisclaimer() { m_hasUserAgreedToDisclaimer = true; }
 	void OnReadDisclaimer(wxMouseEvent& event);
 
-	bool IsIsoSelected() { return m_mainPanel->GetISOFile().FileExists(); }
+	bool IsIsoSelected() { return btfl::GetIsoFileName().FileExists(); }
 	bool HasUserAgreedToDisclaimer() { return m_hasUserAgreedToDisclaimer; }
 
 	inline const wxBitmap& GetBackgroundBitmap() { return m_mainPanel->GetBackgroundBitmap(); }

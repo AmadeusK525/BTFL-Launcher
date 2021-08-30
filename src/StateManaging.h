@@ -57,6 +57,12 @@ namespace btfl
 	void SetState(LauncherState state);
 
 	void UpdateDatabase(const btfl::SQLEntry& sqlEntry);
+
+	const wxFileName& GetIsoFileName();
+	void SetIsoFileName(const wxFileName& fileName);
+
+	bool HasUserAgreedToDisclaimer();
+	void AgreeToDisclaimer();
 }
 
 #endif
