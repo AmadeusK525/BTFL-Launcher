@@ -37,6 +37,43 @@ void DisclaimerPanel::PaintBackground(wxDC& dc)
 //////////////////////////// SecondaryPanel /////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
+XS_IMPLEMENT_CLONABLE_CLASS(CheckboxShape, wxSFRoundRectShape);
+
+CheckboxShape::CheckboxShape() : wxSFRoundRectShape()
+{
+	SetState(false);
+	SetRadius(2.0);
+
+	AddStyle(sfsEMIT_EVENTS);
+
+	RemoveStyle(sfsHIGHLIGHTING);
+	RemoveStyle(sfsPOSITION_CHANGE);
+	RemoveStyle(sfsPARENT_CHANGE);
+	RemoveStyle(sfsSIZE_CHANGE);
+	RemoveStyle(sfsSHOW_HANDLES);
+}
+
+void CheckboxShape::SetState(bool isChecked)
+{
+	if ( isChecked )
+	{
+		SetFill(wxBrush(*wxWHITE));
+		SetBorder(wxPen(wxColour(50, 180, 220), 2));
+	}
+	else
+	{
+		SetFill(*wxTRANSPARENT_BRUSH);
+		SetBorder(wxPen(*wxWHITE, 2 ));
+	}
+
+	m_bIsChecked = isChecked;
+	Refresh();
+}
+
+void CheckboxShape::OnLeftClick(const wxPoint& pos)
+{
+	SetState(!m_bIsChecked);
+}
 
 wxBEGIN_EVENT_TABLE(SecondaryPanel, BackgroundImageCanvas)
 
@@ -90,6 +127,8 @@ void SecondaryPanel::ShowDisclaimer()
 	
 	if ( !m_disclaimer )
 	{
+		DeleteSettingsShapes();
+
 		m_disclaimer = new DisclaimerPanel(this, -1, "", wxDefaultPosition, wxSize(700, -1));
 		CustomRTCScrollbar* scrollbar = new CustomRTCScrollbar(this, m_disclaimer, -1);
 
@@ -160,6 +199,7 @@ void SecondaryPanel::ShowDisclaimer()
 void SecondaryPanel::ShowSettings()
 {
 	m_title->SetText("SETTINGS");
+	wxSFDiagramManager* pManager = GetDiagramManager();
 
 	if ( m_disclaimer )
 	{
@@ -168,18 +208,75 @@ void SecondaryPanel::ShowSettings()
 
 		if ( m_disDecline )
 		{
-			wxSFDiagramManager* manager = GetDiagramManager();
-			manager->RemoveShape(m_disDecline, false);
-			manager->RemoveShape(m_disAgree, true);
+			pManager->RemoveShape(m_disDecline, false);
+			pManager->RemoveShape(m_disAgree, true);
 			m_disDecline = nullptr;
 			m_disAgree = nullptr;
 		}
+	}
+
+	if ( !m_mainSettingsGrid )
+	{
+		m_mainSettingsGrid = (wxSFFlexGridShape*)pManager->AddShape(CLASSINFO(wxSFFlexGridShape), false);
+		m_mainSettingsGrid->AcceptChild(wxT("All"));
+		m_mainSettingsGrid->SetFill(*wxTRANSPARENT_BRUSH);
+		m_mainSettingsGrid->SetBorder(*wxTRANSPARENT_PEN);
+		m_mainSettingsGrid->SetDimensions(5, 2);
+		m_mainSettingsGrid->SetCellSpace(15);
+		m_mainSettingsGrid->SetStyle(0);
+
+		wxSFTextShape* pInstallPathLabel = (wxSFTextShape*)pManager->AddShape(CLASSINFO(wxSFTextShape), false);
+		pInstallPathLabel->SetTextColour(*wxWHITE);
+		pInstallPathLabel->SetFont(wxFontInfo(14).Bold().FaceName("Times New Roman"));
+		SetShapeStyle(pInstallPathLabel);
+		pInstallPathLabel->SetText("Install Path                                            ");
+
+		m_installPath = (wxSFTextShape*)pManager->AddShape(CLASSINFO(wxSFTextShape), false);
+		m_installPath->SetTextColour(*wxWHITE);
+		m_installPath->SetFont(wxFontInfo(14).FaceName("Times New Roman"));
+		SetShapeStyle(m_installPath);
+
+		wxSFTextShape* pAutoUpdateLabel = (wxSFTextShape*)pManager->AddShape(CLASSINFO(wxSFTextShape), false);
+		pAutoUpdateLabel->SetTextColour(*wxWHITE);
+		pAutoUpdateLabel->SetFont(wxFontInfo(14).Bold().FaceName("Times New Roman"));
+		SetShapeStyle(pAutoUpdateLabel);
+		pAutoUpdateLabel->SetText("Automatically look for and install updates                   ");
+
+		m_autoUpdate = (CheckboxShape*)pManager->AddShape(CLASSINFO(CheckboxShape), false);
+		m_autoUpdate->SetRectSize(25, 25);
+
+		m_uninstallButton = new TransparentButton("UNINSTALL", wxDefaultPosition, wxDefaultPosition, 3.0, pManager);
+		m_uninstallButton->SetId(BUTTON_Uninstall);
+		m_uninstallButton->SetFont(wxFontInfo(20).FaceName("Times New Roman"));
+		m_uninstallButton->AddStyle(wxSFShapeBase::STYLE::sfsSIZE_CHANGE);
+		pManager->AddShape(m_uninstallButton, nullptr, wxDefaultPosition, true, false);
+
+		m_mainSettingsGrid->AppendToGrid(pInstallPathLabel);
+		m_mainSettingsGrid->AppendToGrid(m_installPath);
+		m_mainSettingsGrid->AppendToGrid(pAutoUpdateLabel);
+		m_mainSettingsGrid->AppendToGrid(m_autoUpdate);
+		m_mainSettingsGrid->AppendToGrid(m_uninstallButton);
+
+		m_mainSettingsGrid->Update();
 	}
 
 	Layout();
 	SendSizeEvent();
 	RepositionAll();
 	Refresh();
+}
+
+void SecondaryPanel::SelectInstallPath()
+{
+	wxDirDialog dirDialog(nullptr, _("Please select an original Shadow Of The Colossus ISO file..."),
+		"./", wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+	
+	if ( dirDialog.ShowModal() == wxID_OK )
+	{
+		m_installPath->SetText(dirDialog.GetPath());
+		RepositionAll();
+		Refresh();
+	}
 }
 
 void SecondaryPanel::OnFrameButtons(wxSFShapeMouseEvent& event)
@@ -248,6 +345,42 @@ void SecondaryPanel::RepositionAll()
 			m_disAgree->MoveTo(disclaimerRect.GetRight() - shapeSize.x, yButtonHalf - (shapeSize.y / 2));
 		}
 	}
+	else if ( m_mainSettingsGrid )
+	{
+		m_mainSettingsGrid->Update();
+		m_mainSettingsGrid->SetRelativePosition(
+			(GetSize().x - m_mainSettingsGrid->GetRectSize().x) / 2,
+			70.0
+		);
+
+		m_fInstallPathBmpScale = double(m_installPath->GetRectSize().y) / m_installPathBmp.GetHeight();
+		m_installPathBmpPos = wxPoint(
+			(m_installPath->GetAbsolutePosition().x - (m_installPathBmp.GetWidth() * m_fInstallPathBmpScale) - 5) / m_fInstallPathBmpScale,
+			m_installPath->GetAbsolutePosition().y / m_fInstallPathBmpScale
+		);
+	}
+}
+
+void SecondaryPanel::DeleteSettingsShapes()
+{
+	if ( !m_mainSettingsGrid )
+		return;
+
+	wxSFDiagramManager* pManager = GetDiagramManager();
+	pManager->RemoveShape(m_mainSettingsGrid, false);
+	
+	m_installPath = nullptr;
+	m_autoUpdate = nullptr;
+	m_uninstallButton = nullptr;
+	m_mainSettingsGrid = nullptr;
+}
+
+void SecondaryPanel::SetShapeStyle(wxSFShapeBase* shape)
+{
+	shape->SetStyle(
+		wxSFShapeBase::STYLE::sfsALWAYS_INSIDE |
+		wxSFShapeBase::STYLE::sfsSIZE_CHANGE
+	);
 }
 
 void SecondaryPanel::DrawForeground(wxDC& dc, bool fromPaint)
@@ -255,6 +388,13 @@ void SecondaryPanel::DrawForeground(wxDC& dc, bool fromPaint)
 	dc.SetUserScale(m_bgScale, m_bgScale);
 	dc.DrawBitmap(m_topSeparator, 0, 49.0 / m_bgScale, true);
 	dc.SetUserScale(1.0, 1.0);
+
+	if ( m_mainSettingsGrid )
+	{
+		dc.SetUserScale(m_fInstallPathBmpScale, m_fInstallPathBmpScale);
+		dc.DrawBitmap(m_installPathBmp, m_installPathBmpPos.x, m_installPathBmpPos.y, true);
+		dc.SetUserScale(1.0, 1.0);
+	}
 }
 
 void SecondaryPanel::OnSize(wxSizeEvent& event)
@@ -272,4 +412,34 @@ void SecondaryPanel::OnSize(wxSizeEvent& event)
 	}
 
 	RepositionAll();
+}
+
+void SecondaryPanel::OnLeftDown(wxMouseEvent& event)
+{
+	BackgroundImageCanvas::OnLeftDown(event);
+
+	if ( m_bIsHoveringInstallPath )
+	{
+		SelectInstallPath();
+	}
+}
+
+void SecondaryPanel::OnMouseMove(wxMouseEvent& event)
+{
+	BackgroundImageCanvas::OnMouseMove(event);
+
+	if ( m_mainSettingsGrid )
+	{
+		wxRect installPathBmpRect(
+			m_installPathBmpPos * m_fInstallPathBmpScale, 
+			m_installPathBmp.GetSize() * m_fInstallPathBmpScale
+		);
+
+		bool bIsHoveringInstallPath = installPathBmpRect.Contains(event.GetPosition());
+		if ( bIsHoveringInstallPath != m_bIsHoveringInstallPath )
+		{
+			SetCursor((wxStockCursor)((wxCURSOR_DEFAULT * !bIsHoveringInstallPath) + (wxCURSOR_CLOSED_HAND * bIsHoveringInstallPath)));
+			m_bIsHoveringInstallPath = bIsHoveringInstallPath;
+		}
+	}
 }

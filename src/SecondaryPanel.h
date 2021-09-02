@@ -35,10 +35,29 @@ public:
 
 enum
 {
-	BUTTON_Back,
+	BUTTON_Back = wxID_HIGHEST,
 
 	BUTTON_DisclaimerAgree,
-	BUTTON_DisclaimerAgreeVerify
+	BUTTON_DisclaimerAgreeVerify,
+
+	BUTTON_Uninstall
+};
+
+class CheckboxShape : public wxSFRoundRectShape
+{
+private:
+	bool m_bIsChecked = false;
+
+public:
+	XS_DECLARE_CLONABLE_CLASS(CheckboxShape);
+	CheckboxShape();
+
+	bool IsChecked() { return m_bIsChecked; }
+	void SetState(bool isChecked);
+
+	virtual void OnLeftClick(const wxPoint& pos) override;
+	virtual void OnMouseEnter(const wxPoint& pos) override { GetParentCanvas()->SetCursor(wxCURSOR_CLOSED_HAND); }
+	virtual void OnMouseLeave(const wxPoint& pos) override { GetParentCanvas()->SetCursor(wxCURSOR_DEFAULT); }
 };
 
 class SecondaryPanel : public BackgroundImageCanvas
@@ -61,20 +80,37 @@ private:
 	TransparentButton* m_disDecline = nullptr,
 		* m_disAgree = nullptr;
 
+	/////////////////// Settings ///////////////////////
+	wxSFFlexGridShape* m_mainSettingsGrid = nullptr;
+	wxSFTextShape* m_installPath = nullptr;
+	CheckboxShape* m_autoUpdate = nullptr;
+	TransparentButton* m_uninstallButton = nullptr;
+
+	bool m_bIsHoveringInstallPath = false;
+
+	wxBitmap m_installPathBmp{ "Assets\\Icon\\Folder@2x.png", wxBITMAP_TYPE_PNG };
+	float m_fInstallPathBmpScale = 1.0;
+	wxPoint m_installPathBmpPos;
+
 public:
 	SecondaryPanel(wxSFDiagramManager* manager, MainFrame* parent);
 
 	void ShowDisclaimer();
 	void ShowSettings();
 
+	void SelectInstallPath();
+
 	void OnFrameButtons(wxSFShapeMouseEvent& event);
 	void OnAcceptDisclaimer(wxSFShapeMouseEvent& event);
 
 	void RepositionAll();
+	void DeleteSettingsShapes();
+	void SetShapeStyle(wxSFShapeBase* shape);
 	virtual void DrawForeground(wxDC& dc, bool fromPaint) override;
 
 	virtual void OnSize(wxSizeEvent& event) override;
-	virtual void OnMouseMove(wxMouseEvent& event) override { wxSFShapeCanvas::OnMouseMove(event); }
+	virtual void OnLeftDown(wxMouseEvent& event) override;
+	virtual void OnMouseMove(wxMouseEvent& event) override;
 
 	wxDECLARE_EVENT_TABLE();
 };
