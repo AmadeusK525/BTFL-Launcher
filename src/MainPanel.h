@@ -6,6 +6,8 @@
 #include <wx\filename.h>
 #include <wx\wxsf\wxShapeFramework.h>
 
+#include <atomic>
+
 #include "BaseClasses.h"
 #include "PatchNotes.h"
 #include "FrameButtons.h"
@@ -98,7 +100,7 @@ private:
 	wxSFTextShape* m_gaugeLabel = nullptr,
 		* m_gaugeProgress = nullptr;
 	wxTimer m_gaugeTimer;
-	int m_nextGaugeValue;
+	std::atomic<int> m_nextGaugeValue;
 	wxString m_nextGaugeLabel;
 	GaugeResult m_gaugeResult = GAUGE_Invalid;
 

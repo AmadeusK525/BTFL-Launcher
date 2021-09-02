@@ -165,37 +165,22 @@ void MainPanel::VerifyIso()
 		[&]()
 		{
 			m_nextGaugeLabel = "Verifying ISO validity...";
-			m_nextGaugeValue = 4;
-
-			int gaugeValue = 4;
-			bool isIsoValid = false;
-
 			srand(time(0));
 
-			for ( iso::ISO_Region region = iso::ISO_Usa; region < iso::ISO_Invalid; region = (iso::ISO_Region)(region + 1) )
-			{
-				// Generate a random number for the gauge but keeping in mind the fact that
-				// It has to take into account the current loop we're in.
-				int max = (100 / iso::NUMBER_OF_ISOS) * (region + 1);
-				m_nextGaugeValue = (rand() % (max - gaugeValue)) + gaugeValue;
-				gaugeValue = m_nextGaugeValue;
-				
-				// Instead of calling iso::GetFileHash() once and storing the value, call it
-				// multiple times so that the process artificially takes a longer time.
-				if ( iso::IsHashFromIso(iso::GetFileHash(m_iso.GetFullPath()), region) )
-					isIsoValid = true;
-			}
+			wxString fileHash = iso::GetFileHash(m_iso.GetFullPath(), m_nextGaugeValue);
+			
+			m_nextGaugeLabel = "Processing results...";
+			iso::ISO_Region region = iso::GetIsoRegion(fileHash);
 
 			// Change m_gaugeResult so that the function OnGaugeFinished() knows what to
 			// do next.
-			if ( isIsoValid )
+			if ( region != iso::ISO_Invalid )
 				m_gaugeResult = GAUGE_VerifyValid;
 			else
 				m_gaugeResult = GAUGE_VerifyInvalid;
 
 			// And set the gauge to 100 to trigger the function call.
 			m_nextGaugeValue = 100;
-			m_nextGaugeLabel = "Processing results...";
 		}
 	);
 

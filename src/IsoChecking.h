@@ -5,40 +5,55 @@
 #include <wx\wx.h>
 #include <wx\wfstream.h>
 
+#include <atomic>
+
 #include <digestpp.hpp>
 #include "IsoHashes.h"
 
 namespace iso
 {
-	const int NUMBER_OF_ISOS = 2;
+	const int NUMBER_OF_ISOS = 4;
 	enum ISO_Region
 	{
-		ISO_Usa,
-		ISO_Brazil,
+		ISO_Usa_Brazil,
+		ISO_Europe_Australia,
+		ISO_Japan,
+		ISO_PS3,
 
 		ISO_Invalid
 	};
 
-	inline bool IsHashFromIso(const wxString& userHash, ISO_Region region)
+	inline ISO_Region GetIsoRegion(const wxString& userHash)
 	{
-		wxString hash;
-		switch ( region )
+		for ( ISO_Region region = ISO_Usa_Brazil; region != ISO_Invalid; region = ISO_Region(region + 1) )
 		{
-		case ISO_Usa:
-			hash = iso_usa;
-			break;
+			wxString hash;
+			switch ( region )
+			{
+			case ISO_Usa_Brazil:
+				hash = iso_us_97472;
+				break;
 
-		case ISO_Brazil:
-			break;
+			case ISO_Europe_Australia:
+				hash = iso_eu_au_53326;
+				break;
 
-		case ISO_Invalid:
-			break;
+			case ISO_Japan:
+				hash = iso_jp_19335;
+				break;
+				
+			case ISO_Invalid:
+				continue;
+			}
+
+			if ( hash == userHash )
+				return region;
 		}
-
-		return hash == userHash;
+		
+		return ISO_Invalid;
 	}
 
-	inline wxString GetFileHash(const wxString& filePath)
+	inline wxString GetFileHash(const wxString& filePath, std::atomic<int>& gaugeUpdater)
 	{
 		wxFileInputStream stream(filePath);
 		if ( !stream.IsOk() )
@@ -46,45 +61,26 @@ namespace iso
 
 		size_t fullLength = stream.GetLength();
 		const size_t READ_LENGTH = 100000000;
-		size_t length = 0;
-		size_t toRead = READ_LENGTH;
-		char* buffer;
+		unsigned char* buffer;
 
-		digestpp::sha3 hasher(256);
-		int index = 1;
+		int index = 0;
+		double gaugeSteps = (95 / (double(fullLength) / READ_LENGTH));
 
-		while ( length < fullLength )
+		digestpp::sha1 hasher;
+
+		while ( stream.CanRead() )
 		{
-			length += toRead;
-			if ( length > fullLength )
-			{
-				length -= READ_LENGTH;
-				toRead = fullLength - length;
-			}
+			buffer = new unsigned char[READ_LENGTH];
+			stream.Read(buffer, READ_LENGTH);
 
-			buffer = new char[toRead];
-			stream.Read(buffer, toRead);
-
-			hasher.absorb(buffer);
+			hasher.absorb(buffer, stream.LastRead());
 			delete[] buffer;
+
+			gaugeUpdater = (rand() % int(gaugeSteps)) + (gaugeSteps * index++);
 		}
 
 		return hasher.hexdigest();
 	}
-
-	// Currently unused
-	inline ISO_Region CheckIsoValidity(const wxString& path)
-	{
-		wxString userHash = GetFileHash(path);
-		for ( ISO_Region region = ISO_Usa; region != ISO_Invalid; region = (ISO_Region)(region + 1) )
-		{
-			if ( IsHashFromIso(userHash, region) )
-				return region;
-		}
-
-		return ISO_Invalid;
-	}
-
 };
 
 #endif
