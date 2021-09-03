@@ -3,6 +3,9 @@
 #include "IsoHashes.h"
 #include "IsoChecking.h"
 
+#include <wx/xml/xml.h>
+#include <wx/sstream.h>
+
 #include <thread>
 
 btfl::SQLDatabase::SQLDatabase(wxFileName& path)
@@ -245,11 +248,11 @@ void btfl::Init()
 		userEntry.integers["user_state"] = currentState;
 		userEntry.integers["has_agreed_to_disclaimer"] = false;
 		userEntry.integers["iso_region"] = iso::ISO_Region::ISO_Invalid;
-		userEntry.strings["iso_file_path"] = "";
+		userEntry.strings["iso_file_path"] = isoFileName.GetFullPath();
 
 		btfl::SQLEntry launcherEntry("launcher_data");
-		launcherEntry.strings["install_path"] = "./Game";
-		launcherEntry.strings["installed_version"] = "";
+		launcherEntry.strings["install_path"] = installFileName.GetFullPath();;
+		launcherEntry.strings["installed_version"] = sInstalledVersion;
 		launcherEntry.strings["settings_xml"] = "";
 
 		pDatabase->InsertSQLEntry(userEntry);
@@ -304,7 +307,33 @@ void btfl::LoadLauncher(btfl::SQLDatabase* database)
 	{
 		installFileName.Assign(result.GetAsString("install_path"));
 		sInstalledVersion = result.GetAsString("installed_version");
+
+		wxStringInputStream settingsStream(result.GetAsString("settings_xml"));
+		if ( settingsStream.GetSize() )
+		{
+			wxXmlDocument settingsDoc(settingsStream);
+
+			btfl::Settings settings;
+			settings.DeserializeObject(settingsDoc.GetRoot()->GetChildren());
+			pMainFrame->GetSecondaryPanel()->SetSettings(settings);
+		}
 	}
+}
+
+void btfl::SaveSettings(btfl::Settings& settings)
+{
+	wxXmlDocument settingsDoc;
+	wxXmlNode* pSettingsRootNode = new wxXmlNode(nullptr, wxXML_ELEMENT_NODE, "settings_xml");
+	settingsDoc.SetRoot(pSettingsRootNode);
+	pSettingsRootNode->AddChild(settings.SerializeObject(nullptr));
+
+	wxStringOutputStream settingsStream;
+	settingsDoc.Save(settingsStream);
+
+	btfl::SQLEntry sqlEntry("launcher_data");
+	sqlEntry.strings["settings_xml"] = settingsStream.GetString();
+
+	btfl::UpdateDatabase(sqlEntry);
 }
 
 void btfl::UpdateDatabase(const btfl::SQLEntry& sqlEntry)
@@ -331,6 +360,20 @@ void btfl::SetIsoFileName(const wxFileName& fileName)
 	btfl::SQLEntry sqlEntry("user_data");
 	sqlEntry.strings["iso_file_path"] = fileName.GetFullPath();
 	btfl::UpdateDatabase(sqlEntry);
+}
+
+const wxFileName& btfl::GetInstallFileName()
+{
+	return installFileName;
+}
+
+void btfl::SetInstallPath(const wxString& installPath)
+{
+	installFileName.Assign(installPath);
+
+	btfl::SQLEntry sqlEntry("launcher_data");
+	sqlEntry.strings["install_path"] = installFileName.GetFullPath();
+	UpdateDatabase(sqlEntry);
 }
 
 bool btfl::HasUserAgreedToDisclaimer()

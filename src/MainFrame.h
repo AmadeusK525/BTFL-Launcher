@@ -40,6 +40,8 @@ public:
 		long style = wxDEFAULT_FRAME_STYLE,
 		const wxString& name = wxFrameNameStr);
 
+	SecondaryPanel* GetSecondaryPanel() { return m_seconPanel; }
+
 	void LoadPatchNotes();
 	void OnLoadPatchNotesTimer(wxTimerEvent& event);
 

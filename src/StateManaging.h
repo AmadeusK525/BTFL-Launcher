@@ -6,6 +6,7 @@
 
 #include <wx/wxsqlite3.h>
 #include <wx/filename.h>
+#include <wx/wxxmlserializer/XmlSerializer.h>
 
 namespace btfl
 {
@@ -50,9 +51,20 @@ namespace btfl
 		STATE_UpdatingGame
 	};
 
+	struct Settings: public xsSerializable
+	{
+		bool bLookForUpdates = true;
+
+		Settings()
+		{
+			XS_SERIALIZE_BOOL(bLookForUpdates, "look_for_updates");
+		}
+	};
+
 	void Init();
 	void ShutDown();
 	void LoadLauncher(btfl::SQLDatabase* database);
+	void SaveSettings(btfl::Settings& settings);
 
 	void SetState(LauncherState state);
 
@@ -60,6 +72,9 @@ namespace btfl
 
 	const wxFileName& GetIsoFileName();
 	void SetIsoFileName(const wxFileName& fileName);
+
+	const wxFileName& GetInstallFileName();
+	void SetInstallPath(const wxString& installPath);
 
 	bool HasUserAgreedToDisclaimer();
 	void AgreeToDisclaimer();
