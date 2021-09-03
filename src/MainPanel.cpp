@@ -228,7 +228,7 @@ void MainPanel::VerifyIso()
 
 	// Start the gauge timer so that updates to m_nextGaugeValue are
 	// taken into account.
-	m_gaugeTimer.Start(1);
+	m_gaugeTimer.Start(100);
 
 	// Start a new thread so we don't hog the program when verifying the iso.
 	std::thread thread(
