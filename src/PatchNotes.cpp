@@ -186,9 +186,7 @@ bool LeftSidebar::Load()
 			buf.SetBasicStyle(m_rtc->GetBasicStyle());
 
 			m_rtc->GetBuffer() = buf;
-			m_rtc->Invalidate();
-			m_rtc->Refresh();
-			m_rtc->Update();
+			m_rtc->LayoutContent();
 			m_scrollbar->RecalculateSelf();
 
 			delete file;
